@@ -213,16 +213,108 @@ $('simulateBtn').addEventListener('click', () => answerQuestion('What is RAG and
 $('codeHelpBtn').addEventListener('click', () => answerQuestion('Two Sum — explain the optimal solution with code'))
 $('designHelpBtn').addEventListener('click', () => answerQuestion('System design: design a URL shortener'))
 
-// ---------- mic (SpeechRecognition) ----------
-$('micBtn').addEventListener('click', () => {
+// ---------- audio engine: mic + tab audio -> live transcript ----------
+// Two transcription paths:
+//  1. SpeechRecognition (Chrome only, free, no key) for the mic — fast.
+//  2. Groq Whisper (needs the free Groq key in Settings) for tab / system
+//     audio and as the mic fallback — a browser cannot feed a tab-audio
+//     stream into SpeechRecognition, so Whisper is the only way to turn
+//     the interviewer's Meet/Zoom audio into text.
+const LANG_CODE = { English: 'en', Hindi: 'hi', Hinglish: 'hi', Spanish: 'es', French: 'fr', German: 'de', Japanese: 'ja', Mandarin: 'zh' }
+const SR_LANG = { English: 'en-US', Hindi: 'hi-IN', Hinglish: 'hi-IN', Spanish: 'es-ES', French: 'fr-FR', German: 'de-DE', Japanese: 'ja-JP', Mandarin: 'zh-CN' }
+let micStream = null
+let micRecorder = null
+let tabRecorder = null
+let tabCtx = null
+let whisperBusy = false
+let whisperQueue = []
+let lastWhisperText = ''
+let noKeyWarned = false
+
+function audioStatus(text) { const el = $('audioStatus'); if (el) el.textContent = text }
+function langCode() { return LANG_CODE[currentSession?.language || getSettings().lang] || 'en' }
+
+function pickMimeType() {
+  const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', '']
+  for (const m of candidates) { if (!m) return ''; try { if (MediaRecorder.isTypeSupported(m)) return m } catch {} }
+  return ''
+}
+
+async function whisperTranscribe(blob) {
+  const settings = getSettings()
+  if (!settings.groqKey) {
+    if (!noKeyWarned) { noKeyWarned = true; addTranscript('[Tab/mic audio needs a free Groq key for transcription — add it in Settings (console.groq.com → API Keys), then restart capture. Mic speech recognition in Chrome still works without a key.]') }
+    return ''
+  }
+  try {
+    const form = new FormData()
+    form.append('file', blob, 'chunk.webm')
+    form.append('model', 'whisper-large-v3-turbo')
+    form.append('language', langCode())
+    form.append('response_format', 'json')
+    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + settings.groqKey }, body: form })
+    if (!res.ok) { const d = await res.json().catch(() => ({})); addTranscript('[Whisper error: ' + (d?.error?.message || 'HTTP ' + res.status) + ' — check the Groq key in Settings.]'); return '' }
+    const data = await res.json()
+    return (data.text || '').trim()
+  } catch (err) { addTranscript('[Whisper failed: ' + err.message + ']'); return '' }
+}
+
+// Transcribe chunks one at a time so answers stay in order.
+async function pumpWhisperQueue() {
+  if (whisperBusy) return
+  whisperBusy = true
+  while (whisperQueue.length) {
+    const { blob, label } = whisperQueue.shift()
+    const text = await whisperTranscribe(blob)
+    if (!text || text.length < 2) continue
+    if (text === lastWhisperText) continue // Whisper repeats itself on silence
+    lastWhisperText = text
+    addTranscript(label + ': ' + text)
+    audioStatus('🎧 Last heard ' + new Date().toLocaleTimeString() + ' — ' + label)
+    if (isQuestion(text) && $('autoAnswer').checked) answerQuestion(text)
+  }
+  whisperBusy = false
+}
+
+function startWhisperRecorder(stream, label) {
+  const audioOnly = new MediaStream(stream.getAudioTracks())
+  if (!audioOnly.getAudioTracks().length) return null
+  const mime = pickMimeType()
+  let rec
+  try { rec = new MediaRecorder(audioOnly, mime ? { mimeType: mime } : undefined) } catch { return null }
+  rec.ondataavailable = (e) => { if (e.data && e.data.size > 1000) { whisperQueue.push({ blob: e.data, label }); pumpWhisperQueue() } }
+  rec.onerror = () => { audioStatus('⚠️ ' + label + ' recorder error — restart capture.') }
+  try { rec.start(5000) } catch { return null } // 5-second chunks
+  return rec
+}
+function stopRecorder(rec) { try { if (rec && rec.state !== 'inactive') rec.stop() } catch {} }
+
+// ---------- mic (SpeechRecognition in Chrome, Whisper fallback) ----------
+$('micBtn').addEventListener('click', async () => {
+  if (micOn) { stopMic(); return }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition
-  if (!SR) { alert('Speech recognition is not supported in this browser. Use desktop Chrome, or type the question instead.'); return }
-  if (micOn && recognition) { recognition.stop(); micOn = false; $('micBtn').textContent = '🎤 Start Mic'; return }
+  if (SR) { startMicSR(SR); return }
+  // No SpeechRecognition (Firefox / Safari / in-app browsers) — Whisper mic instead.
+  await startMicWhisper()
+})
+
+function stopMic() {
+  micOn = false
+  try { recognition?.stop() } catch {}
+  recognition = null
+  stopRecorder(micRecorder); micRecorder = null
+  micStream?.getTracks().forEach((t) => t.stop()); micStream = null
+  $('micBtn').textContent = '🎤 Start Mic'
+  audioStatus('Mic stopped.')
+}
+
+function startMicSR(SR) {
   recognition = new SR()
   recognition.continuous = true
   recognition.interimResults = true
-  recognition.lang = 'en-US'
+  recognition.lang = SR_LANG[currentSession?.language || getSettings().lang] || 'en-US'
   let finalText = ''
+  let restarting = false
   recognition.onresult = (e) => {
     let interim = ''
     for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -230,44 +322,104 @@ $('micBtn').addEventListener('click', () => {
       if (e.results[i].isFinal) finalText += t + ' '
       else interim += t
     }
-    addTranscript('… ' + (finalText + interim).trim())
-    const text = (finalText + interim).trim()
-    if (isQuestion(text) && $('autoAnswer').checked) {
+    // Interim text lives in the status line only — the transcript only
+    // gets final sentences, so it no longer floods with "…" lines.
+    audioStatus('🎙️ Mic hearing… ' + (finalText + interim).trim().slice(-80))
+    const text = finalText.trim()
+    if (text && isQuestion(text) && $('autoAnswer').checked) {
+      addTranscript('You: ' + text)
       answerQuestion(text)
       finalText = ''
+    } else if (text && text.length > 200) { addTranscript('You: ' + text); finalText = '' }
+  }
+  recognition.onerror = (e) => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      addTranscript('[Mic blocked — allow microphone access in the browser address bar, then try again.]')
+      stopMic()
+    } else if (e.error === 'network') {
+      audioStatus('⚠️ Mic speech service lost network — retrying…')
+    } else {
+      addTranscript('[Mic error: ' + e.error + ' — type the question instead.]')
     }
   }
-  recognition.onerror = (e) => { addTranscript('[Mic error: ' + e.error + ' — type the question instead.]') }
-  recognition.onend = () => { if (micOn) { try { recognition.start() } catch {} } }
-  recognition.start()
-  micOn = true
-  $('micBtn').textContent = '⏹ Stop Mic'
-  addTranscript('[Mic listening… speak the interviewer question.]')
-})
+  recognition.onend = () => {
+    // Chrome stops recognition after pauses; restart while mic is on.
+    if (micOn && !restarting) {
+      restarting = true
+      setTimeout(() => { restarting = false; if (micOn) { try { recognition.start() } catch {} } }, 300)
+    }
+  }
+  try {
+    recognition.start()
+    micOn = true
+    $('micBtn').textContent = '⏹ Stop Mic'
+    addTranscript('[Mic listening (speech recognition)… speak the question, or capture the Meet/Zoom tab for the interviewer.]')
+    audioStatus('🎙️ Mic on — listening…')
+  } catch (err) {
+    addTranscript('[Mic could not start: ' + err.message + ' — trying Whisper mic instead.]')
+    startMicWhisper()
+  }
+}
 
-// ---------- tab audio (Meet/Zoom in browser) ----------
+async function startMicWhisper() {
+  if (!getSettings().groqKey) { alert('This browser has no built-in speech recognition, and no Groq key is set. Add a free Groq key in Settings (console.groq.com → API Keys) for mic transcription, or type the question instead.'); return }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    micRecorder = startWhisperRecorder(micStream, 'You')
+    if (!micRecorder) { addTranscript('[Mic recorder could not start in this browser.]'); return }
+    micOn = true
+    $('micBtn').textContent = '⏹ Stop Mic'
+    addTranscript('[Mic listening (Whisper)… speak and the transcript will appear in ~5 second chunks.]')
+    audioStatus('🎙️ Mic on (Whisper) — listening…')
+  } catch (err) {
+    alert('Microphone was blocked or is unavailable. Allow microphone access and retry. (' + err.message + ')')
+  }
+}
+
+// ---------- tab audio (Meet/Zoom in browser) — now actually transcribed ----------
 $('tabAudioBtn').addEventListener('click', async () => {
+  if (tabStream) { stopTabAudio(); return }
   try {
     tabStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
-    const ctx = new AudioContext()
-    const src = ctx.createMediaStreamSource(tabStream)
-    const analyser = ctx.createAnalyser()
+    const audioTracks = tabStream.getAudioTracks()
+    if (!audioTracks.length) {
+      addTranscript('[This capture has NO audio track — stop it, pick the Meet/Zoom tab again and tick “Share audio” before sharing.]')
+      tabStream.getTracks().forEach((t) => t.stop()); tabStream = null
+      return
+    }
+    // Level meter (visual only).
+    tabCtx = new AudioContext()
+    const src = tabCtx.createMediaStreamSource(new MediaStream(audioTracks))
+    const analyser = tabCtx.createAnalyser()
     src.connect(analyser)
     const data = new Uint8Array(analyser.frequencyBinCount)
     const tick = () => {
       if (!tabStream || tabStream.getTracks().every((t) => t.readyState === 'ended')) return
       analyser.getByteFrequencyData(data)
       const level = Math.round(data.reduce((a, b) => a + b, 0) / data.length)
-      $('tabAudioBtn').textContent = '🔊 Tab audio live · level ' + level
+      $('tabAudioBtn').textContent = '🔊 Tab audio live · level ' + level + ' (click to stop)'
       requestAnimationFrame(tick)
     }
     tick()
-    tabStream.getVideoTracks()[0].addEventListener('ended', () => { $('tabAudioBtn').textContent = '🗂️ Capture Meet/Zoom Tab Audio'; tabStream = null })
-    addTranscript('[Tab audio captured — pick the Meet/Zoom tab and tick “Share audio”. Live transcription of tab audio is not available in the browser, so type the question or use the mic as well.]')
+    tabStream.getVideoTracks()[0]?.addEventListener('ended', () => stopTabAudio())
+    audioTracks[0].addEventListener('ended', () => stopTabAudio())
+    // Real transcription: 5-second Whisper chunks of the tab audio only.
+    tabRecorder = startWhisperRecorder(tabStream, 'Interviewer')
+    if (!tabRecorder) addTranscript('[Tab audio captured, but the recorder could not start in this browser — type the question or use the mic as well.]')
+    else if (!getSettings().groqKey) addTranscript('[Tab audio captured — level meter is live. Add a free Groq key in Settings to transcribe the interviewer’s voice; without it, use the mic or type the question.]')
+    else addTranscript('[Tab audio live — the interviewer’s voice will be transcribed in ~5 second chunks. Pick the Meet/Zoom tab and keep “Share audio” ticked.]')
   } catch (err) {
     alert('Tab capture was cancelled or is not supported. Use the mic or type the question instead. (' + err.message + ')')
   }
 })
+
+function stopTabAudio() {
+  stopRecorder(tabRecorder); tabRecorder = null
+  tabStream?.getTracks().forEach((t) => t.stop()); tabStream = null
+  tabCtx?.close().catch(() => {}); tabCtx = null
+  $('tabAudioBtn').textContent = '🗂️ Capture Meet/Zoom Tab Audio'
+  audioStatus('Tab audio stopped.')
+}
 
 // ---------- floating panel ----------
 $('floatMinBtn').addEventListener('click', () => { $('floatBody').style.display = $('floatBody').style.display === 'none' ? '' : 'none' })
@@ -288,8 +440,8 @@ function makeNotes(session) {
 }
 $('endLiveBtn').addEventListener('click', () => {
   if (!currentSession) { show('dashboard'); return }
-  if (micOn && recognition) { try { recognition.stop() } catch {} micOn = false }
-  if (tabStream) { tabStream.getTracks().forEach((t) => t.stop()); tabStream = null }
+  stopMic()
+  stopTabAudio()
   currentSession.notes = makeNotes(currentSession)
   currentSession.score = currentSession.notes.score
   saveSessions(getSessions().map((s) => (s.id === currentSession.id ? currentSession : s)))
