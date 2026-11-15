@@ -1,0 +1,53 @@
+:root{--bg:#0b1020;--bg2:#111936;--card:#151f42;--line:#26336b;--text:#eef2ff;--muted:#a5b0d6;--accent:#6c8cff;--accent2:#22c55e;--warn:#f59e0b;--danger:#ef4444;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#0d1330 60%,#0b1020);color:var(--text);line-height:1.55}
+a{color:var(--accent)}
+header{position:sticky;top:0;z-index:20;background:rgba(11,16,32,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav{max-width:1100px;margin:0 auto;display:flex;gap:14px;align-items:center;padding:12px 16px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:18px;letter-spacing:.2px}
+.logo span{color:var(--accent)}
+.nav button,.nav a{color:var(--muted);background:none;border:0;cursor:pointer;font:inherit;text-decoration:none;padding:6px 8px;border-radius:8px}
+.nav button:hover,.nav a:hover{color:var(--text);background:#1b2650}
+.nav .cta{background:var(--accent);color:#fff;font-weight:700}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 80px}
+section{display:none}
+section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:14px 0}
+.hero{padding:44px 20px;text-align:center}
+.hero h1{font-size:42px;line-height:1.1;margin:10px 0}
+.hero p{color:var(--muted);font-size:18px;max-width:720px;margin:0 auto}
+.pill{display:inline-block;background:#1b2650;border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--muted);font-size:13px}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer;font-size:15px;text-decoration:none}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.btn.green{background:var(--accent2)}
+.btn.danger{background:var(--danger)}
+.btn.small{padding:7px 12px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+h2{font-size:26px;margin:18px 0 6px}
+h3{margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+input,select,textarea{width:100%;background:#0e1533;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;margin:6px 0 12px}
+label{font-weight:600;font-size:13px;color:var(--muted)}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-block;background:#1b2650;border:1px solid var(--line);border-radius:999px;padding:5px 10px;margin:3px;font-size:13px;cursor:pointer}
+.chip.active{background:var(--accent);color:#fff}
+.banner{background:#3a2a05;border:1px solid var(--warn);color:#ffe9b0;border-radius:12px;padding:12px 14px;margin:12px 0}
+.banner b{color:#fff}
+.transcript{background:#0a0f24;border:1px solid var(--line);border-radius:12px;padding:14px;min-height:140px;max-height:300px;overflow:auto;white-space:pre-wrap}
+.answer{background:#10231a;border:1px solid #1e7a4a;border-radius:12px;padding:14px}
+.answer h4{margin:0 0 6px;color:#7dffb0}
+code,pre{background:#0a0f24;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+table{width:100%;border-collapse:collapse}
+td,th{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;vertical-align:top}
+.session{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;background:#131c3d}
+.live-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--danger);margin-right:6px;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+#floatPanel{position:fixed;right:16px;bottom:16px;width:360px;max-width:calc(100vw - 32px);background:#101a3d;border:1px solid var(--accent);border-radius:14px;padding:14px;z-index:50;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#floatPanel.smallText{font-size:13px}
+#floatPanel.hidden{display:none}
+#floatPanel.discreet{opacity:.92;background:#0d1430}
+.timer{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+footer{color:var(--muted);text-align:center;padding:30px 16px;font-size:13px}
+@media(max-width:640px){.hero h1{font-size:30px}.nav{ gap:6px}}
