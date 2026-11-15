@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interview Assistant — Real-Time AI Interview Helper</title>
+<meta name="description" content="Real-time AI interview assistant: listens to the interviewer, detects the question, and shows a suggested answer live. Mock interviews, resume grounding, saved sessions and AI notes." />
+<link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <div class="logo">🎙️ Interview<span>Assistant</span></div>
+    <button data-nav="home">Home</button>
+    <button data-nav="dashboard">Dashboard</button>
+    <button data-nav="create">New Session</button>
+    <button data-nav="mock">Mock Interview</button>
+    <button data-nav="bank">Question Bank</button>
+    <button data-nav="pricing">Pricing</button>
+    <button data-nav="settings">Settings</button>
+    <span style="flex:1"></span>
+    <button class="cta" data-nav="create">Try for Free</button>
+  </nav>
+</header>
+
+<main>
+  <!-- LANDING -->
+  <section id="home" class="active">
+    <div class="hero">
+      <span class="pill">No. 1 style real-time AI interview assistant — web version</span>
+      <h1>Get the right answer<br/>while you're still talking.</h1>
+      <p>Through interviews, sales calls, client meetings, or any conversation where freezing up isn't an option. It listens, detects the question, and shows you a suggested answer — live.</p>
+      <div class="row" style="justify-content:center;margin-top:18px">
+        <button class="btn" data-nav="create">Start a Live Session</button>
+        <button class="btn ghost" data-nav="mock">Practice a Mock Interview</button>
+      </div>
+      <p class="small muted">No sign-up. No API key needed — demo answers work offline in your browser. Add a Groq key in Settings for real AI answers.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><h3>🎯 Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
+      <div class="card"><h3>📄 Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
+      <div class="card"><h3>💻 Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
+      <div class="card"><h3>🧠 Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
+      <div class="card"><h3>📝 AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
+      <div class="card"><h3>🌍 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
+    </div>
+    <div class="card">
+      <h2>Before, during, and after the call</h2>
+      <p class="muted"><b style="color:#fff">01 Auto Answer</b> — live question detection &amp; suggested answers.<br/>
+      <b style="color:#fff">02 Documents</b> — resume, job description and notes as live context.<br/>
+      <b style="color:#fff">03 AI Notes</b> — summary, key points and action items after the call.<br/>
+      <b style="color:#fff">04 Mock Interview</b> — practice first, so the real one feels familiar.</p>
+    </div>
+    <div class="card">
+      <h2>Frequently asked questions</h2>
+      <p><b>Does it need an API key?</b><br/><span class="muted">No. Demo answers run locally in your browser. Add a free Groq key in Settings for real, tailored answers.</span></p>
+      <p><b>How does live listening work?</b><br/><span class="muted">In Chrome, use your microphone (SpeechRecognition) or type the question. For Meet/Zoom in the browser, share the tab with audio. Typed questions always work as a fallback.</span></p>
+      <p><b>Is it invisible in screen-share?</b><br/><span class="muted">No — this web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only a native desktop app can hide from screen-share. Use live help only where it is permitted.</span></p>
+      <p><b>Where is my data?</b><br/><span class="muted">Only in your browser (localStorage). Nothing is sent to a server. Your Groq key, if added, is stored only in your browser.</span></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard">
+    <h2>Call Sessions</h2>
+    <p class="muted">Your saved sessions live only in this browser.</p>
+    <input id="dashSearch" placeholder="Search sessions, company, role…" />
+    <div id="dashFilters" class="row"></div>
+    <div id="dashList"></div>
+    <button class="btn" data-nav="create">+ New Session</button>
+  </section>
+
+  <!-- CREATE -->
+  <section id="create">
+    <h2>Create a Session</h2>
+    <div class="card">
+      <label>Mode</label>
+      <select id="fMode"><option value="Interview">Interview</option><option value="Regular">Regular call / meeting</option></select>
+      <div class="row">
+        <div style="flex:1;min-width:180px"><label>Company</label><input id="fCompany" placeholder="e.g. Google" /></div>
+        <div style="flex:1;min-width:180px"><label>Role</label><input id="fRole" placeholder="e.g. GenAI Engineer Intern" /></div>
+        <div style="flex:1;min-width:160px"><label>Language</label><select id="fLang"><option>English</option><option>Hindi</option><option>Hinglish</option><option>Spanish</option><option>French</option><option>German</option><option>Japanese</option><option>Mandarin</option></select></div>
+      </div>
+      <label>Resume — paste text</label>
+      <textarea id="fResume" placeholder="Paste your resume text here. Answers will cite only facts from this text."></textarea>
+      <label>Resume file — .txt or .pdf</label>
+      <input type="file" id="fResumeFile" accept=".txt,.pdf" />
+      <p class="small muted" id="resumeFileNote">PDF text is extracted in your browser with pdf.js. If extraction fails, paste the text above.</p>
+      <label>Job description / instructions (up to 20,000 chars)</label>
+      <textarea id="fJD" maxlength="20000" placeholder="Paste the job description, or instructions for the assistant…"></textarea>
+      <div class="row">
+        <button class="btn" id="startLiveBtn">Start Live Session →</button>
+        <button class="btn ghost" id="saveSessionBtn">Save as Draft Session</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE -->
+  <section id="live">
+    <h2><span class="live-dot"></span>Live Session <span id="liveTitle" class="muted small"></span></h2>
+    <div class="banner"><b>Honest note:</b> this web version is <b>NOT invisible</b> in screen-share — sharing the whole screen or this browser window will show it. Only a native desktop app can hide from screen-share. Use live help only where the interviewer / company permits it.</div>
+    <div class="row">
+      <div class="timer" id="liveTimer">00:00</div>
+      <button class="btn green" id="micBtn">🎤 Start Mic</button>
+      <button class="btn ghost" id="tabAudioBtn">🗂️ Capture Meet/Zoom Tab Audio</button>
+      <label class="small"><input type="checkbox" id="autoAnswer" checked style="width:auto" /> Auto Answer</label>
+      <label class="small"><input type="checkbox" id="discreetToggle" style="width:auto" /> Discreet panel</label>
+      <label class="small"><input type="checkbox" id="smallTextToggle" style="width:auto" /> Small text</label>
+      <span style="flex:1"></span>
+      <button class="btn danger" id="endLiveBtn">End &amp; Save Notes</button>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="card"><h3>Live transcript</h3><div class="transcript" id="transcript">Transcript will appear here. Use the mic in Chrome, or type the interviewer's question below.</div></div>
+      <div class="card"><h3>Suggested answer</h3><div id="answerBox"><p class="muted">Ask a question and the suggested answer will appear here.</p></div></div>
+    </div>
+    <div class="card">
+      <label>Type the interviewer's question (works everywhere — no mic needed)</label>
+      <div class="row"><input id="typedQ" placeholder="e.g. What is RAG?" style="flex:1;margin:0" /><button class="btn" id="askBtn">Answer</button></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost small" id="codeHelpBtn">💻 Code Help</button>
+        <button class="btn ghost small" id="designHelpBtn">📐 System Design Help</button>
+        <button class="btn ghost small" id="simulateBtn">▶ Simulate a question</button>
+      </div>
+      <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Transcription is browser-based; typed questions are the reliable fallback.</p>
+    </div>
+  </section>
+
+  <!-- MOCK -->
+  <section id="mock">
+    <h2>Mock Interview</h2>
+    <div class="card" id="mockSetup">
+      <label>Topic</label>
+      <select id="mockTopic"></select>
+      <label>Company (optional)</label><input id="mockCompany" placeholder="e.g. Google" />
+      <button class="btn" id="startMockBtn">Start Mock Interview</button>
+      <p class="small muted">5 questions, one by one. Answer out loud or type your answer, get per-answer feedback, then a scored report.</p>
+    </div>
+    <div class="card" id="mockRun" style="display:none">
+      <p class="muted" id="mockProgress"></p>
+      <h3 id="mockQ"></h3>
+      <textarea id="mockA" placeholder="Type your answer here…"></textarea>
+      <div class="row"><button class="btn" id="mockNextBtn">Submit Answer →</button><button class="btn ghost" id="mockEndBtn">End Mock</button></div>
+      <div id="mockFeedback"></div>
+    </div>
+    <div class="card" id="mockResult" style="display:none"></div>
+  </section>
+
+  <!-- QUESTION BANK -->
+  <section id="bank">
+    <h2>Question Bank</h2>
+    <p class="muted">Tap a question to send it to the Live session.</p>
+    <div id="bankList"></div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <h2>Transparent Pricing</h2>
+    <p class="muted">Display only — this demo has no payment. The real Parakeet-style plans are shown for reference.</p>
+    <div class="grid">
+      <div class="card"><h3>Free</h3><p class="timer">$0</p><p class="muted">Demo answers, 1 mock interview, saved sessions in your browser.</p></div>
+      <div class="card"><h3>Weekly</h3><p class="timer">$78<span class="small muted"> / week</span></p><p class="muted">Unlimited calls, unlimited mock interviews.</p></div>
+      <div class="card"><h3>Monthly — Most popular</h3><p class="timer">$149.90<span class="small muted"> / month</span></p><p class="muted">Unlimited calls, unlimited mock interviews, resume PDFs, headshots.</p></div>
+      <div class="card"><h3>Yearly — Best value</h3><p class="timer">$49.99<span class="small muted"> / month</span></p><p class="muted">Billed $599.90/year. Same as monthly.</p></div>
+    </div>
+    <p class="muted">Credits (reference): 0.5 credits = 30 minutes. Credits never expire.</p>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings">
+    <h2>Settings</h2>
+    <div class="card">
+      <label>Groq API key (optional — for real AI answers)</label>
+      <input id="groqKey" type="password" placeholder="gsk_… — stored only in this browser, never sent anywhere else" />
+      <label>Groq model</label>
+      <input id="groqModel" value="openai/gpt-oss-120b" />
+      <label>Default language</label>
+      <select id="setLang"><option>English</option><option>Hindi</option><option>Hinglish</option></select>
+      <button class="btn" id="saveSettingsBtn">Save Settings</button>
+      <button class="btn ghost" id="clearDataBtn">Clear All Saved Data</button>
+      <p class="small muted">Get a free key at console.groq.com. Without a key, the app uses the local demo answer bank. Your key is stored only in localStorage on this device and is never committed or uploaded.</p>
+    </div>
+    <div class="card">
+      <h3>Your resume (saved)</h3>
+      <p class="muted small" id="savedResumeInfo">No resume saved yet — paste one in New Session.</p>
+      <h3>Your documents</h3>
+      <div id="docsList"></div>
+      <label>Add a document / note</label>
+      <input id="docTitle" placeholder="Title, e.g. Job description — GenAI Intern" />
+      <textarea id="docText" placeholder="Paste the document text…"></textarea>
+      <button class="btn small" id="addDocBtn">Add Document</button>
+    </div>
+  </section>
+
+  <!-- SESSION DETAIL -->
+  <section id="sessionDetail">
+    <button class="btn ghost small" data-nav="dashboard">← Back to Dashboard</button>
+    <div id="sessionDetailBody"></div>
+  </section>
+</main>
+
+<!-- Floating discreet panel -->
+<div id="floatPanel" class="hidden">
+  <div class="row" style="justify-content:space-between">
+    <b>Assistant</b>
+    <span><button class="btn ghost small" id="floatMinBtn">—</button> <button class="btn ghost small" id="floatCloseBtn">✕</button></span>
+  </div>
+  <div id="floatBody" class="small">Suggested answer will appear here.</div>
+</div>
+
+<footer>Interview Assistant — standalone web demo inspired by Parakeet AI. Not affiliated with Parakeet AI. Use live help only where permitted.</footer>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

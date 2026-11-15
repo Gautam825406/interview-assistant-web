@@ -1,0 +1,1 @@
+{"dependencies":{"pdfjs-dist":"^4.10.38"},"description":"Parakeet-style real-time AI interview assistant — standalone static web version (Vite, no backend, no API key required).","devDependencies":{"vite":"^6.0.3"},"name":"interview-assistant-web","private":true,"scripts":{"build":"vite build","dev":"vite","preview":"vite preview"},"type":"module","version":"1.0.0"}
