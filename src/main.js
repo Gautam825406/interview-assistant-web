@@ -459,6 +459,62 @@ function stopTabAudio() {
   audioStatus('Tab audio stopped.')
 }
 
+// ---------- screenshot: capture the screen, READ the question, answer it ----------
+async function groqVision(image) {
+  const settings = getSettings()
+  if (!settings.groqKey) return null
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + settings.groqKey },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        messages: [{ role: 'user', content: [
+          { type: 'text', text: 'Read this screenshot of an interview / coding question on screen. Extract the exact question or problem shown, word for word, including any code, numbers and constraints. Reply with ONLY the extracted question/problem text, nothing else. If no question is visible, reply with exactly: NO QUESTION FOUND' },
+          { type: 'image_url', image_url: { url: image } },
+        ] }],
+        temperature: 0.2,
+        max_tokens: 1000,
+      }),
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return (data.choices?.[0]?.message?.content || '').trim()
+  } catch { return null }
+}
+
+$('shotBtn').addEventListener('click', async () => {
+  if (!getSettings().groqKey) { alert('Screenshot reading needs a free Groq key in Settings — add it, then tap Screenshot again. Without a key, type the question instead.'); return }
+  let stream = null
+  try {
+    $('shotBox').innerHTML = '<p class="small muted">📸 Pick the screen or window with the question…</p>'
+    stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+    const track = stream.getVideoTracks()[0]
+    const video = document.createElement('video')
+    video.srcObject = stream
+    await video.play()
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d').drawImage(video, 0, 0)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+    stream.getTracks().forEach((t) => t.stop())
+    stream = null
+    $('shotBox').innerHTML = `<img src="${dataUrl}" style="max-width:100%;border-radius:8px" /><p class="small muted">📸 Reading the screenshot…</p>`
+    const q = await groqVision(dataUrl)
+    if (!q || /^NO QUESTION FOUND/i.test(q)) {
+      $('shotBox').innerHTML += '<p class="small muted">No question found in the screenshot — make sure the problem is visible on screen, then try again.</p>'
+      return
+    }
+    $('shotBox').innerHTML += `<p><b>Read from screen:</b> ${esc(q)}</p>`
+    answerQuestion(q)
+  } catch (err) {
+    stream?.getTracks().forEach((t) => t.stop())
+    if (err?.name === 'NotAllowedError') $('shotBox').innerHTML = '<p class="small muted">Screenshot was cancelled.</p>'
+    else $('shotBox').innerHTML = '<p class="small muted">Screenshot failed: ' + esc(err.message) + '</p>'
+  }
+})
+
 // ---------- floating panel ----------
 $('floatMinBtn').addEventListener('click', () => { $('floatBody').style.display = $('floatBody').style.display === 'none' ? '' : 'none' })
 $('floatCloseBtn').addEventListener('click', () => $('floatPanel').classList.add('hidden'))
