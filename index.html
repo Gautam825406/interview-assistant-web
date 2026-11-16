@@ -11,59 +11,91 @@
 <header>
   <nav class="nav">
     <div class="logo">🎙️ Interview<span>Assistant</span></div>
-    <button data-nav="home">Home</button>
-    <button data-nav="dashboard">Dashboard</button>
-    <button data-nav="create">New Session</button>
-    <button data-nav="mock">Mock Interview</button>
-    <button data-nav="bank">Question Bank</button>
-    <button data-nav="pricing">Pricing</button>
-    <button data-nav="settings">Settings</button>
+    <span class="nav-main">
+      <button data-nav="home">Home</button>
+      <button data-nav="dashboard">Dashboard</button>
+      <button data-nav="create">New Session</button>
+      <button data-nav="mock">Mock Interview</button>
+      <button data-nav="bank">Question Bank</button>
+      <button data-nav="pricing">Pricing</button>
+      <button data-nav="settings">Settings</button>
+      <button data-nav="admin" id="adminNavBtn" class="admin-only">Admin</button>
+    </span>
     <span style="flex:1"></span>
-    <button class="cta" data-nav="create">Try for Free</button>
+    <span class="nav-main" id="userChip"></span>
+    <button class="btn ghost small nav-main" id="logoutBtn">Log out</button>
+    <button class="cta nav-guest" data-nav="auth">Log in / Sign up</button>
   </nav>
 </header>
 
 <main>
+  <!-- AUTH -->
+  <section id="auth">
+    <div class="auth-wrap">
+      <div class="auth-card glass">
+        <div class="logo big">🎙️ Interview<span>Assistant</span></div>
+        <p class="muted">Real-time AI answers while you're still talking. Sign up free — 10 live sessions and 1 mock interview included.</p>
+        <div class="row auth-tabs">
+          <button class="chip active" id="tabLogin">Log in</button>
+          <button class="chip" id="tabSignup">Sign up</button>
+        </div>
+        <div id="signupFields" style="display:none">
+          <label>Your name</label>
+          <input id="authName" placeholder="e.g. Gautam Keshri" autocomplete="name" />
+        </div>
+        <label>Email</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+        <label>Password</label>
+        <input id="authPassword" type="password" placeholder="At least 6 characters" autocomplete="current-password" />
+        <p class="small danger-text" id="authError" style="display:none"></p>
+        <button class="btn wide" id="authSubmitBtn">Log in</button>
+        <p class="small muted" id="authHint">New here? Switch to the Sign up tab — the first account created becomes the service admin.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- LANDING -->
   <section id="home" class="active">
     <div class="hero">
-      <span class="pill">No. 1 style real-time AI interview assistant — web version</span>
-      <h1>Get the right answer<br/>while you're still talking.</h1>
+      <span class="pill">✨ Live AI interview assistant — powered by the service, no keys needed</span>
+      <h1>Get the right answer<br/><span class="grad">while you're still talking.</span></h1>
       <p>Through interviews, sales calls, client meetings, or any conversation where freezing up isn't an option. It listens, detects the question, and shows you a suggested answer — live.</p>
       <div class="row" style="justify-content:center;margin-top:18px">
         <button class="btn" data-nav="create">Start a Live Session</button>
         <button class="btn ghost" data-nav="mock">Practice a Mock Interview</button>
       </div>
-      <p class="small muted">No sign-up. No API key needed — demo answers work offline in your browser. Add a Groq key in Settings for real AI answers.</p>
+      <p class="small muted">Free plan: 10 live sessions (10 min each) + 1 mock interview. Upgrade anytime — secure checkout by Cashfree.</p>
+      <div class="plan-strip" id="homePlanStrip"></div>
     </div>
     <div class="grid">
-      <div class="card"><h3>🎯 Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
-      <div class="card"><h3>📄 Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
-      <div class="card"><h3>💻 Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
-      <div class="card"><h3>🧠 Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
-      <div class="card"><h3>📝 AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
-      <div class="card"><h3>🌍 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
+      <div class="card glass"><h3>🎯 Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
+      <div class="card glass"><h3>📄 Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
+      <div class="card glass"><h3>💻 Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
+      <div class="card glass"><h3>🧠 Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
+      <div class="card glass"><h3>📝 AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
+      <div class="card glass"><h3>🌍 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
     </div>
-    <div class="card">
+    <div class="card glass">
       <h2>Before, during, and after the call</h2>
-      <p class="muted"><b style="color:#fff">01 Auto Answer</b> — live question detection &amp; suggested answers.<br/>
-      <b style="color:#fff">02 Documents</b> — resume, job description and notes as live context.<br/>
-      <b style="color:#fff">03 AI Notes</b> — summary, key points and action items after the call.<br/>
-      <b style="color:#fff">04 Mock Interview</b> — practice first, so the real one feels familiar.</p>
+      <p class="muted"><b class="bright">01 Auto Answer</b> — live question detection &amp; suggested answers.<br/>
+      <b class="bright">02 Documents</b> — resume, job description and notes as live context.<br/>
+      <b class="bright">03 AI Notes</b> — summary, key points and action items after the call.<br/>
+      <b class="bright">04 Mock Interview</b> — practice first, so the real one feels familiar.</p>
     </div>
-    <div class="card">
+    <div class="card glass">
       <h2>Frequently asked questions</h2>
-      <p><b>Does it need an API key?</b><br/><span class="muted">No. Demo answers run locally in your browser. Add a free Groq key in Settings for real, tailored answers.</span></p>
+      <p><b>Does it need an API key?</b><br/><span class="muted">No — the AI runs on our servers. You just sign up and use it; the service owner manages the AI providers.</span></p>
       <p><b>How does live listening work?</b><br/><span class="muted">In Chrome, use your microphone (SpeechRecognition) or type the question. For Meet/Zoom in the browser, share the tab with audio. Typed questions always work as a fallback.</span></p>
       <p><b>Is it invisible in screen-share?</b><br/><span class="muted">No — this web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only a native desktop app can hide from screen-share. Use live help only where it is permitted.</span></p>
-      <p><b>Where is my data?</b><br/><span class="muted">Only in your browser (localStorage). Nothing is sent to a server. Your Groq key, if added, is stored only in your browser.</span></p>
+      <p><b>Where is my data?</b><br/><span class="muted">Your account, plan and usage live on the service. Your session notes and resume stay in your browser unless you save them in a session.</span></p>
+      <p><b>How do I pay?</b><br/><span class="muted">Pick a plan on the Pricing page and pay securely with Cashfree (UPI, cards, net-banking). Your plan activates as soon as the payment succeeds.</span></p>
     </div>
   </section>
 
   <!-- DASHBOARD -->
   <section id="dashboard">
     <h2>Call Sessions</h2>
-    <p class="muted">Your saved sessions live only in this browser.</p>
+    <p class="muted" id="dashPlanLine">Your saved sessions live only in this browser.</p>
     <input id="dashSearch" placeholder="Search sessions, company, role…" />
     <div id="dashFilters" class="row"></div>
     <div id="dashList"></div>
@@ -73,7 +105,7 @@
   <!-- CREATE -->
   <section id="create">
     <h2>Create a Session</h2>
-    <div class="card">
+    <div class="card glass">
       <label>Mode</label>
       <select id="fMode"><option value="Interview">Interview</option><option value="Regular">Regular call / meeting</option></select>
       <div class="row">
@@ -92,6 +124,7 @@
         <button class="btn" id="startLiveBtn">Start Live Session →</button>
         <button class="btn ghost" id="saveSessionBtn">Save as Draft Session</button>
       </div>
+      <p class="small muted" id="sessionGateNote"></p>
     </div>
   </section>
 
@@ -110,13 +143,14 @@
       <span style="flex:1"></span>
       <button class="btn danger" id="endLiveBtn">End &amp; Save Notes</button>
     </div>
-    <p class="small muted" id="audioStatus">Audio: mic off · tab audio off. Tip — add a free Groq key in Settings to transcribe the interviewer's Meet/Zoom tab audio.</p>
+    <p class="small muted" id="audioStatus">Audio: mic off · tab audio off. Transcription runs on the service — no key needed.</p>
+    <p class="small muted" id="aiStatusLine"></p>
     <div id="shotBox"></div>
     <div class="grid" style="grid-template-columns:1fr 1fr">
-      <div class="card"><h3>Live transcript</h3><div class="transcript" id="transcript">Transcript will appear here. Mic works in Chrome without a key; Meet/Zoom tab audio is transcribed with a free Groq key (Settings).</div></div>
-      <div class="card"><h3>Suggested answer</h3><div id="answerBox"><p class="muted">Ask a question and the suggested answer will appear here.</p></div></div>
+      <div class="card glass"><h3>Live transcript</h3><div class="transcript" id="transcript">Transcript will appear here. Mic works in Chrome; Meet/Zoom tab audio is transcribed by the service.</div></div>
+      <div class="card glass"><h3>Suggested answer</h3><div id="answerBox"><p class="muted">Ask a question and the suggested answer will appear here.</p></div></div>
     </div>
-    <div class="card">
+    <div class="card glass">
       <label>Type the interviewer's question (works everywhere — no mic needed)</label>
       <div class="row"><input id="typedQ" placeholder="e.g. What is RAG?" style="flex:1;margin:0" /><button class="btn" id="askBtn">Answer</button></div>
       <div class="row" style="margin-top:10px">
@@ -124,28 +158,28 @@
         <button class="btn ghost small" id="designHelpBtn">📐 System Design Help</button>
         <button class="btn ghost small" id="simulateBtn">▶ Simulate a question</button>
       </div>
-      <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Screenshot: pick the screen with the question — the app reads it and answers. Transcription is browser-based; typed questions are the reliable fallback.</p>
+      <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Screenshot: pick the screen with the question — the app reads it and answers. Transcription runs on the service; typed questions are the reliable fallback.</p>
     </div>
   </section>
 
   <!-- MOCK -->
   <section id="mock">
     <h2>Mock Interview</h2>
-    <div class="card" id="mockSetup">
+    <div class="card glass" id="mockSetup">
       <label>Topic</label>
       <select id="mockTopic"></select>
       <label>Company (optional)</label><input id="mockCompany" placeholder="e.g. Google" />
       <button class="btn" id="startMockBtn">Start Mock Interview</button>
-      <p class="small muted">5 questions, one by one. Answer out loud or type your answer, get per-answer feedback, then a scored report.</p>
+      <p class="small muted" id="mockGateNote">5 questions, one by one. Answer out loud or type your answer, get per-answer feedback, then a scored report.</p>
     </div>
-    <div class="card" id="mockRun" style="display:none">
+    <div class="card glass" id="mockRun" style="display:none">
       <p class="muted" id="mockProgress"></p>
       <h3 id="mockQ"></h3>
       <textarea id="mockA" placeholder="Type your answer here…"></textarea>
       <div class="row"><button class="btn" id="mockNextBtn">Submit Answer →</button><button class="btn ghost" id="mockEndBtn">End Mock</button></div>
       <div id="mockFeedback"></div>
     </div>
-    <div class="card" id="mockResult" style="display:none"></div>
+    <div class="card glass" id="mockResult" style="display:none"></div>
   </section>
 
   <!-- QUESTION BANK -->
@@ -158,31 +192,34 @@
   <!-- PRICING -->
   <section id="pricing">
     <h2>Transparent Pricing</h2>
-    <p class="muted">Display only — this demo has no payment. The real Parakeet-style plans are shown for reference.</p>
-    <div class="grid">
-      <div class="card"><h3>Free</h3><p class="timer">$0</p><p class="muted">Demo answers, 1 mock interview, saved sessions in your browser.</p></div>
-      <div class="card"><h3>Weekly</h3><p class="timer">$78<span class="small muted"> / week</span></p><p class="muted">Unlimited calls, unlimited mock interviews.</p></div>
-      <div class="card"><h3>Monthly — Most popular</h3><p class="timer">$149.90<span class="small muted"> / month</span></p><p class="muted">Unlimited calls, unlimited mock interviews, resume PDFs, headshots.</p></div>
-      <div class="card"><h3>Yearly — Best value</h3><p class="timer">$49.99<span class="small muted"> / month</span></p><p class="muted">Billed $599.90/year. Same as monthly.</p></div>
-    </div>
-    <p class="muted">Credits (reference): 0.5 credits = 30 minutes. Credits never expire.</p>
+    <p class="muted">Pay securely with Cashfree — UPI, cards, net-banking. Your plan activates as soon as the payment succeeds.</p>
+    <p class="small" id="currentPlanLine"></p>
+    <div class="grid" id="plansGrid"><p class="muted">Loading plans…</p></div>
+    <p class="small muted" id="payResult"></p>
+    <p class="muted">Free plan: 10 live sessions (10 minutes each) + 1 mock interview. Paid plans: unlimited sessions and mocks.</p>
   </section>
 
   <!-- SETTINGS -->
   <section id="settings">
     <h2>Settings</h2>
-    <div class="card">
-      <label>Groq API key (optional — for real AI answers)</label>
-      <input id="groqKey" type="password" placeholder="gsk_… — stored only in this browser, never sent anywhere else" />
-      <label>Groq model</label>
-      <input id="groqModel" value="openai/gpt-oss-120b" />
+    <div class="card glass">
+      <h3>Your account</h3>
+      <div id="accountInfo"><p class="muted">Loading…</p></div>
+      <div class="row">
+        <button class="btn ghost small" id="cancelSubBtn" style="display:none">Cancel subscription</button>
+        <button class="btn ghost small" id="logoutBtn2">Log out</button>
+      </div>
+    </div>
+    <div class="card glass">
+      <h3>AI service</h3>
+      <p class="muted small" id="aiStatusSettings">Checking…</p>
       <label>Default language</label>
       <select id="setLang"><option>English</option><option>Hindi</option><option>Hinglish</option></select>
       <button class="btn" id="saveSettingsBtn">Save Settings</button>
       <button class="btn ghost" id="clearDataBtn">Clear All Saved Data</button>
-      <p class="small muted">Get a free key at console.groq.com. Without a key, the app uses the local demo answer bank. Your key is stored only in localStorage on this device and is never committed or uploaded.</p>
+      <p class="small muted">The AI runs on the service — there are no API keys to enter here. If the AI is not ready, the service owner needs to add a provider key in the Admin panel.</p>
     </div>
-    <div class="card">
+    <div class="card glass">
       <h3>Your resume (saved)</h3>
       <p class="muted small" id="savedResumeInfo">No resume saved yet — paste one in New Session.</p>
       <h3>Your documents</h3>
@@ -194,12 +231,44 @@
     </div>
   </section>
 
+  <!-- ADMIN -->
+  <section id="admin">
+    <h2>Admin Panel</h2>
+    <p class="muted">Service owner only — prices, provider keys, users and payments.</p>
+    <div class="row" id="adminTabs">
+      <button class="chip active" data-atab="overview">Overview</button>
+      <button class="chip" data-atab="users">Users</button>
+      <button class="chip" data-atab="subs">Subscriptions</button>
+      <button class="chip" data-atab="payments">Payments</button>
+      <button class="chip" data-atab="plans">Plans</button>
+      <button class="chip" data-atab="providers">AI Providers</button>
+    </div>
+    <div id="adminOverview" class="atab"></div>
+    <div id="adminUsers" class="atab" style="display:none"></div>
+    <div id="adminSubs" class="atab" style="display:none"></div>
+    <div id="adminPayments" class="atab" style="display:none"></div>
+    <div id="adminPlans" class="atab" style="display:none"></div>
+    <div id="adminProviders" class="atab" style="display:none"></div>
+  </section>
+
   <!-- SESSION DETAIL -->
   <section id="sessionDetail">
     <button class="btn ghost small" data-nav="dashboard">← Back to Dashboard</button>
     <div id="sessionDetailBody"></div>
   </section>
 </main>
+
+<!-- Upgrade modal -->
+<div id="upgradeModal" class="modal hidden">
+  <div class="modal-card glass">
+    <h3>⭐ Upgrade to keep going</h3>
+    <p class="muted" id="upgradeText">Your free plan limit is reached.</p>
+    <div class="row">
+      <button class="btn" id="upgradeGoBtn">See Plans</button>
+      <button class="btn ghost" id="upgradeCloseBtn">Not now</button>
+    </div>
+  </div>
+</div>
 
 <!-- Floating discreet panel -->
 <div id="floatPanel" class="hidden">
@@ -210,7 +279,7 @@
   <div id="floatBody" class="small">Suggested answer will appear here.</div>
 </div>
 
-<footer>Interview Assistant — standalone web demo inspired by Parakeet AI. Not affiliated with Parakeet AI. Use live help only where permitted.</footer>
+<footer>Interview Assistant — subscription service inspired by Parakeet AI. Not affiliated with Parakeet AI. Use live help only where permitted.</footer>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>
