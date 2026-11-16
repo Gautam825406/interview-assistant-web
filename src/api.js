@@ -5,7 +5,7 @@
 
 export const API_BASE =
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) ||
-  'https://interview-assistant-api.onrender.com'
+  'https://interview-assistant-api-s0sx.onrender.com'
 
 const TOKEN_KEY = 'ia_token'
 const USER_KEY = 'ia_user'
