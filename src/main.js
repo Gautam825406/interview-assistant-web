@@ -459,16 +459,18 @@ function stopTabAudio() {
   audioStatus('Tab audio stopped.')
 }
 
-// ---------- screenshot: capture the screen, READ the question, answer it ----------
+// Groq's live vision model (Nov 2026): qwen/qwen3.8-27b. Llama 4 Scout was
+// decommissioned 2026-07-17 and qwen3.6-27b shut down 2026-09-14, so both
+// return "model does not exist". Returns { text } or { error }.
 async function groqVision(image) {
   const settings = getSettings()
-  if (!settings.groqKey) return null
+  if (!settings.groqKey) return { error: 'No Groq key set — add it in Settings.' }
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + settings.groqKey },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        model: 'qwen/qwen3.8-27b',
         messages: [{ role: 'user', content: [
           { type: 'text', text: 'Read this screenshot of an interview / coding question on screen. Extract the exact question or problem shown, word for word, including any code, numbers and constraints. Reply with ONLY the extracted question/problem text, nothing else. If no question is visible, reply with exactly: NO QUESTION FOUND' },
           { type: 'image_url', image_url: { url: image } },
@@ -477,10 +479,12 @@ async function groqVision(image) {
         max_tokens: 1000,
       }),
     })
-    if (!res.ok) return null
-    const data = await res.json()
-    return (data.choices?.[0]?.message?.content || '').trim()
-  } catch { return null }
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) return { error: data?.error?.message || ('Groq error ' + res.status) }
+    const raw = (data.choices?.[0]?.message?.content || '').trim()
+    // qwen3.8 is a thinking model — strip any reasoning block so only the question remains
+    return { text: raw.replace(/<think>[\s\S]*?<\/think>/gi, '').trim() }
+  } catch (err) { return { error: err.message } }
 }
 
 $('shotBtn').addEventListener('click', async () => {
@@ -501,7 +505,12 @@ $('shotBtn').addEventListener('click', async () => {
     stream.getTracks().forEach((t) => t.stop())
     stream = null
     $('shotBox').innerHTML = `<img src="${dataUrl}" style="max-width:100%;border-radius:8px" /><p class="small muted">📸 Reading the screenshot…</p>`
-    const q = await groqVision(dataUrl)
+    const r = await groqVision(dataUrl)
+    if (r.error) {
+      $('shotBox').innerHTML += '<p class="small muted">Could not read the screenshot: ' + esc(r.error) + '</p>'
+      return
+    }
+    const q = r.text
     if (!q || /^NO QUESTION FOUND/i.test(q)) {
       $('shotBox').innerHTML += '<p class="small muted">No question found in the screenshot — make sure the problem is visible on screen, then try again.</p>'
       return
