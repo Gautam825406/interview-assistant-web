@@ -3,8 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Interview Assistant — Real-Time AI Interview Helper</title>
-<meta name="description" content="Real-time AI interview assistant: listens to the interviewer, detects the question, and shows a suggested answer live. Mock interviews, resume grounding, saved sessions and AI notes." />
+<title>IntervIQ — Real-Time AI Interview Copilot</title>
+<meta name="description" content="IntervIQ is a real-time AI interview copilot. It listens while you talk, detects the interviewer's question and shows a short, speakable answer grounded in your resume. Free plan included — Windows, macOS and web." />
+<meta name="keywords" content="real-time AI interview assistant, interview copilot, live interview help, AI interview answers, mock interview practice, interview preparation, AI interviewer, interview notes" />
+<link rel="canonical" href="https://interview-assistant-web-nu.vercel.app/" />
+<meta name="robots" content="index, follow" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="IntervIQ" />
+<meta property="og:title" content="IntervIQ — Real-Time AI Interview Copilot" />
+<meta property="og:description" content="It listens while you talk, detects the interviewer's question and shows a short, speakable answer grounded in your resume. Free to start — Windows, macOS and web." />
+<meta property="og:url" content="https://interview-assistant-web-nu.vercel.app/" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="IntervIQ — Real-Time AI Interview Copilot" />
+<meta name="twitter:description" content="Real-time AI answers while you're still talking — grounded in your resume. Free plan included." />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"IntervIQ","applicationCategory":"BusinessApplication","operatingSystem":["Windows","macOS","Web"],"description":"Real-time AI interview copilot. It listens while you talk, detects the interviewer's question and shows a short, speakable answer grounded in your resume, with mock interviews and AI notes.","offers":{"@type":"Offer","price":"0","priceCurrency":"INR","description":"Free plan: 10 live sessions and 1 mock interview."},"url":"https://interview-assistant-web-nu.vercel.app/"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Do I need an API key?","acceptedAnswer":{"@type":"Answer","text":"No. The AI runs on our servers — you just sign up and use it. The service owner manages the AI providers."}},{"@type":"Question","name":"How does live listening work?","acceptedAnswer":{"@type":"Answer","text":"In Chrome, use your microphone or type the question. For Meet or Zoom in the browser, share the tab with audio. Typed questions always work as a fallback."}},{"@type":"Question","name":"Is it invisible in screen-share?","acceptedAnswer":{"@type":"Answer","text":"No — the web version is not invisible. If you share the whole screen or this browser window, it will show. Only the native desktop app can hide from screen-share."}},{"@type":"Question","name":"How do I pay?","acceptedAnswer":{"@type":"Answer","text":"Pick a plan on the Pricing page and pay securely online — UPI, cards or net-banking. Your plan activates as soon as the payment succeeds."}},{"@type":"Question","name":"Can I cancel anytime?","acceptedAnswer":{"@type":"Answer","text":"Yes. Cancel from Settings — you keep access until the plan expires."}}]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,17 +30,17 @@
 <body>
 <header>
   <nav class="nav">
-    <div class="logo"><span class="logo-mark">🎙️</span> Interview<span>Assistant</span></div>
+    <div class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span> Interv<span>IQ</span></div>
     <span class="nav-label">Menu</span>
     <span class="nav-main">
-      <button data-nav="overview">📊 Overview</button>
-      <button data-nav="sessions">🗂️ Sessions</button>
-      <button data-nav="create">➕ New Session</button>
-      <button data-nav="mock">🎤 Mock Interview</button>
-      <button data-nav="bank">📚 Question Bank</button>
-      <button data-nav="pricing">💳 Pricing</button>
-      <button data-nav="settings">⚙️ Settings</button>
-      <button data-nav="admin" id="adminNavBtn" class="admin-only">🛡️ Admin</button>
+      <button data-nav="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M3 20h18"/></svg> Overview</button>
+      <button data-nav="sessions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg> Sessions</button>
+      <button data-nav="create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Session</button>
+      <button data-nav="mock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> Mock Interview</button>
+      <button data-nav="bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h13"/></svg> Question Bank</button>
+      <button data-nav="pricing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg> Pricing</button>
+      <button data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg> Settings</button>
+      <button data-nav="admin" id="adminNavBtn" class="admin-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 5 3.5 8 7 9 3.5-1 7-4 7-9V6Z"/></svg> Admin</button>
     </span>
     <button class="cta nav-guest" data-nav="auth">Log in / Sign up</button>
   </nav>
@@ -36,14 +53,14 @@
   <div class="topbar" id="topbar">
     <span style="flex:1"></span>
     <span id="userChip"></span>
-    <button class="btn ghost small" data-nav="home">🌐 Visit website</button>
+    <button class="btn ghost small" data-nav="home">Visit website</button>
     <button class="btn ghost small" id="logoutBtn">Log out</button>
   </div>
   <!-- AUTH -->
   <section id="auth">
     <div class="auth-wrap">
       <div class="auth-card glass">
-        <div class="logo big"><span class="logo-mark">🎙️</span> Interview<span>Assistant</span></div>
+        <div class="logo big"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span> Interv<span>IQ</span></div>
         <p class="muted">Real-time AI answers while you're still talking. Sign up free — 10 live sessions and 1 mock interview included.</p>
         <div class="row auth-tabs">
           <button class="chip active" id="tabLogin">Log in</button>
@@ -68,47 +85,83 @@
   <!-- LANDING -->
   <section id="home" class="active">
     <div class="hero">
-      <span class="pill">✨ Live AI interview assistant — powered by the service, no keys needed</span>
-      <h1>Get the right answer<br/><span class="grad">while you're still talking.</span></h1>
-      <p>Through interviews, sales calls, client meetings, or any conversation where freezing up isn't an option. It listens, detects the question, and shows you a suggested answer — live.</p>
+      <span class="pill">Live interview copilot — no API keys, no setup</span>
+      <h1>Never blank on a question again.</h1>
+      <p>IntervIQ listens while you talk, picks out the interviewer's question, and shows you a short, speakable answer — grounded in your own resume, so you sound like yourself, not a script.</p>
       <div class="row" style="justify-content:center;margin-top:18px">
         <button class="btn" data-nav="create">Start a Live Session</button>
         <button class="btn ghost" data-nav="mock">Practice a Mock Interview</button>
       </div>
-      <p class="small muted">Free plan: 10 live sessions (10 min each) + 1 mock interview. Upgrade anytime — secure checkout by Cashfree.</p>
+      <p class="small muted">Free to start — 10 live sessions (10 min each) and 1 mock interview included. No card required.</p>
       <div class="hero-stats">
         <div><b>10</b><span>Free live sessions</span></div>
         <div><b>1</b><span>Free mock interview</span></div>
-        <div><b>0</b><span>API keys needed</span></div>
+        <div><b>0</b><span>API keys to set up</span></div>
       </div>
       <div class="plan-strip" id="homePlanStrip"></div>
     </div>
+    <div class="card glass">
+      <p class="eyebrow">Where it helps</p>
+      <h2>Built for the calls that decide things</h2>
+      <div class="grid">
+        <div><h3>Job interviews</h3><p class="muted">The main use. Technical rounds, HR rounds, system design — answers drawn from your own experience.</p></div>
+        <div><h3>Sales calls</h3><p class="muted">Objection on the line? Get a calm, structured reply while the prospect is still talking.</p></div>
+        <div><h3>Client meetings</h3><p class="muted">Tough questions about scope, timelines and pricing — answered with your own notes in front of you.</p></div>
+        <div><h3>Viva &amp; oral exams</h3><p class="muted">Definitions, derivations, viva questions — short answers you can say out loud, on the spot.</p></div>
+      </div>
+    </div>
+    <div class="section-head">
+      <p class="eyebrow">What it does</p>
+      <h2>Everything you need in the room</h2>
+    </div>
     <div class="grid">
-      <div class="card glass"><h3><span class="icon-tile">🎯</span> Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
-      <div class="card glass"><h3><span class="icon-tile">📄</span> Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
-      <div class="card glass"><h3><span class="icon-tile">💻</span> Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
-      <div class="card glass"><h3><span class="icon-tile">🧠</span> Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
-      <div class="card glass"><h3><span class="icon-tile">📝</span> AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
-      <div class="card glass"><h3><span class="icon-tile">🌍</span> 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></span> Answers while they're still talking</h3><p class="muted">The moment a question is detected, a short answer appears — two or three sentences you can actually say out loud, then the longer version if they dig deeper.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span> Grounded in your resume</h3><p class="muted">Upload your resume and the job description. Answers cite your real projects and numbers — the assistant never invents experience you don't have.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg></span> Coding questions, talked through</h3><p class="muted">Get the approach first, then working code with edge cases and complexity — explained the way you'd explain it in the room.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span> Rehearse before the real thing</h3><p class="muted">Five questions, one at a time, with honest per-answer feedback and a score at the end. Practice the weak ones again tomorrow.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4h14M5 9h14M5 14h9M5 19h6"/></svg></span> Notes, written for you</h3><p class="muted">When the call ends you get a summary, the key points and what to follow up on — no scribbling while you talk.</p></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18M12 3c-3 3.5-3 14 0 18"/></svg></span> Your language</h3><p class="muted">Run the session in English, Hindi, Hinglish, Spanish, French, German, Japanese or Mandarin. Answers come back in the language you picked.</p></div>
     </div>
     <div class="card glass">
       <p class="eyebrow">How it works</p>
       <h2>Before, during, and after the call</h2>
       <div class="steps">
-        <div class="step"><span class="step-num">1</span><b>Auto Answer</b><p class="muted">Live question detection &amp; suggested answers.</p></div>
-        <div class="step"><span class="step-num">2</span><b>Documents</b><p class="muted">Resume, job description and notes as live context.</p></div>
-        <div class="step"><span class="step-num">3</span><b>AI Notes</b><p class="muted">Summary, key points and action items after the call.</p></div>
-        <div class="step"><span class="step-num">4</span><b>Mock Interview</b><p class="muted">Practice first, so the real one feels familiar.</p></div>
+        <div class="step"><span class="step-num">1</span><b>Set up the session</b><p class="muted">Add your resume, the job description and any extra documents. Two minutes, once.</p></div>
+        <div class="step"><span class="step-num">2</span><b>Go live</b><p class="muted">Join your call, open the assistant, and talk normally. Mic or tab audio — or just type the question.</p></div>
+        <div class="step"><span class="step-num">3</span><b>Get the answer</b><p class="muted">A short, speakable answer shows up as the question lands. Screenshot a question straight off the screen if you need to.</p></div>
+        <div class="step"><span class="step-num">4</span><b>Wrap up with notes</b><p class="muted">End the session and get AI notes: a summary, the key points, and what to follow up on.</p></div>
       </div>
+    </div>
+    <div class="card glass" id="download">
+      <p class="eyebrow">Desktop app</p>
+      <h2>Take it with you — Windows &amp; macOS</h2>
+      <p class="muted">The desktop app is the one that hides from screen-share and screenshots. The web app works anywhere, but it can't hide — if you share your screen, it shows. Use live help only where it is allowed.</p>
+      <div class="grid">
+        <div class="dl-card">
+          <span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span>
+          <h3>Windows</h3>
+          <p class="muted small">Windows 10 / 11 · .exe installer · v0.3.0 · about 100 MB</p>
+          <a class="btn" href="https://github.com/Gautam825406/interview-assistant-desktop/releases/tag/v0.3.0">Download for Windows</a>
+        </div>
+        <div class="dl-card">
+          <span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/></svg></span>
+          <h3>macOS</h3>
+          <p class="muted small">macOS 12+ · .dmg · v0.3.0 · about 112 MB</p>
+          <a class="btn" href="https://github.com/Gautam825406/interview-assistant-desktop/releases/tag/v0.3.0">Download for macOS</a>
+        </div>
+      </div>
+      <p class="small muted">Free to download — sign in with your IntervIQ account to use it. Uninstall the old version before installing a new one.</p>
     </div>
     <div class="card glass">
       <p class="eyebrow">FAQ</p>
       <h2>Frequently asked questions</h2>
-      <div class="faq-item"><b>Does it need an API key?</b><p class="muted">No — the AI runs on our servers. You just sign up and use it; the service owner manages the AI providers.</p></div>
-      <div class="faq-item"><b>How does live listening work?</b><p class="muted">In Chrome, use your microphone (SpeechRecognition) or type the question. For Meet/Zoom in the browser, share the tab with audio. Typed questions always work as a fallback.</p></div>
-      <div class="faq-item"><b>Is it invisible in screen-share?</b><p class="muted">No — this web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only a native desktop app can hide from screen-share. Use live help only where it is permitted.</p></div>
+      <div class="faq-item"><b>Do I need an API key?</b><p class="muted">No. The AI runs on our servers — you just sign up and use it. There is nothing to set up and no key to paste anywhere.</p></div>
+      <div class="faq-item"><b>How does live listening work?</b><p class="muted">In Chrome, use your microphone or type the question. For Meet or Zoom in the browser, share the tab with audio. Typed questions always work as a fallback — and on the desktop app you can use system audio too.</p></div>
+      <div class="faq-item"><b>Is it invisible in screen-share?</b><p class="muted">No — the web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only the native desktop app can hide from screen-share. Use live help only where it is permitted.</p></div>
       <div class="faq-item"><b>Where is my data?</b><p class="muted">Your account, plan and usage live on the service. Your session notes and resume stay in your browser unless you save them in a session.</p></div>
-      <div class="faq-item"><b>How do I pay?</b><p class="muted">Pick a plan on the Pricing page and pay securely with Cashfree (UPI, cards, net-banking). Your plan activates as soon as the payment succeeds.</p></div>
+      <div class="faq-item"><b>How do I pay?</b><p class="muted">Pick a plan on the Pricing page and pay securely online — UPI, cards or net-banking. Your plan activates as soon as the payment succeeds.</p></div>
+      <div class="faq-item"><b>What happens when my free sessions run out?</b><p class="muted">The free plan includes 10 live sessions and 1 mock interview. When they're used up, upgrade to a paid plan for unlimited sessions — your saved sessions stay where they are.</p></div>
+      <div class="faq-item"><b>Can I cancel anytime?</b><p class="muted">Yes. Cancel from Settings — you keep access until the plan expires, and you can come back whenever you like.</p></div>
     </div>
   </section>
 
@@ -124,7 +177,7 @@
     </div>
     <div class="stat-grid">
       <div class="stat-card">
-        <div class="stat-icon">🎙️</div>
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
         <div style="flex:1;min-width:0">
           <span class="stat-num" id="statSessions">—</span>
           <span class="stat-label">Live sessions</span>
@@ -133,7 +186,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">🧠</div>
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z"/></svg></div>
         <div style="flex:1;min-width:0">
           <span class="stat-num" id="statMocks">—</span>
           <span class="stat-label">Mock interviews</span>
@@ -142,7 +195,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">💳</div>
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></div>
         <div style="flex:1;min-width:0">
           <span class="stat-num" id="statPlan">FREE</span>
           <span class="stat-label">Current plan</span>
@@ -150,7 +203,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">🤖</div>
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="12" height="12" rx="2"/><path d="M12 8V4M8 4h8M9 13h.01M15 13h.01M9 16h6"/></svg></div>
         <div style="flex:1;min-width:0">
           <span class="stat-num" id="statAi">…</span>
           <span class="stat-label">AI service</span>
@@ -159,9 +212,9 @@
       </div>
     </div>
     <div class="grid">
-      <div class="card glass"><h3><span class="icon-tile">🎙️</span> Start Live Session</h3><p class="muted">Set up your resume and job description, then go live with real-time answers.</p><button class="btn" data-nav="create">New Session →</button></div>
-      <div class="card glass"><h3><span class="icon-tile">🧠</span> Practice Mock</h3><p class="muted">5 questions, one by one, with per-answer feedback and a final score.</p><button class="btn" data-nav="mock">Start Mock →</button></div>
-      <div class="card glass"><h3><span class="icon-tile">📚</span> Question Bank</h3><p class="muted">Common interview questions — tap one to send it straight to a Live session.</p><button class="btn" data-nav="bank">Browse Questions →</button></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span> Start Live Session</h3><p class="muted">Set up your resume and job description, then go live with real-time answers.</p><button class="btn" data-nav="create">New Session →</button></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z"/></svg></span> Practice Mock</h3><p class="muted">5 questions, one by one, with per-answer feedback and a final score.</p><button class="btn" data-nav="mock">Start Mock →</button></div>
+      <div class="card glass"><h3><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h13"/></svg></span> Question Bank</h3><p class="muted">Common interview questions — tap one to send it straight to a Live session.</p><button class="btn" data-nav="bank">Browse Questions →</button></div>
     </div>
     <h3 style="margin:26px 0 4px">Recent sessions</h3>
     <div id="recentList"></div>
@@ -218,9 +271,9 @@
     <div class="banner"><b>Honest note:</b> this web version is <b>NOT invisible</b> in screen-share — sharing the whole screen or this browser window will show it. Only a native desktop app can hide from screen-share. Use live help only where the interviewer / company permits it.</div>
     <div class="row">
       <div class="timer" id="liveTimer">00:00</div>
-      <button class="btn green" id="micBtn">🎤 Start Mic</button>
-      <button class="btn ghost" id="tabAudioBtn">🗂️ Capture Meet/Zoom Tab Audio</button>
-      <button class="btn ghost" id="shotBtn">📸 Screenshot</button>
+      <button class="btn green" id="micBtn">Start Mic</button>
+      <button class="btn ghost" id="tabAudioBtn">Capture Meet/Zoom Tab Audio</button>
+      <button class="btn ghost" id="shotBtn">Screenshot</button>
       <label class="small"><input type="checkbox" id="autoAnswer" checked style="width:auto" /> Auto Answer</label>
       <label class="small"><input type="checkbox" id="discreetToggle" style="width:auto" /> Discreet panel</label>
       <label class="small"><input type="checkbox" id="smallTextToggle" style="width:auto" /> Small text</label>
@@ -238,12 +291,12 @@
       <label>Type the interviewer's question (works everywhere — no mic needed)</label>
       <div class="row"><input id="typedQ" placeholder="e.g. What is RAG?" style="flex:1;margin:0" /><button class="btn" id="askBtn">Answer</button></div>
       <div class="row" style="margin-top:10px">
-        <button class="btn ghost small" id="codeHelpBtn">💻 Code Help</button>
-        <button class="btn ghost small" id="designHelpBtn">📐 System Design Help</button>
-        <button class="btn ghost small" id="simulateBtn">▶ Simulate a question</button>
+        <button class="btn ghost small" id="codeHelpBtn">Code Help</button>
+        <button class="btn ghost small" id="designHelpBtn">System Design Help</button>
+        <button class="btn ghost small" id="simulateBtn">Simulate a question</button>
       </div>
       <div class="row" style="margin-top:10px">
-        <label class="small" for="liveDocFile" style="margin:0">📎 Attach an extra document mid-session:</label>
+        <label class="small" for="liveDocFile" style="margin:0">Attach an extra document mid-session:</label>
         <input type="file" id="liveDocFile" accept=".txt,.pdf" style="width:auto;flex:1" />
       </div>
       <p class="small muted" id="liveDocNote"></p>
@@ -280,8 +333,8 @@
 
   <!-- PRICING -->
   <section id="pricing">
-    <h2>Transparent Pricing</h2>
-    <p class="muted">Pay securely with Cashfree — UPI, cards, net-banking. Your plan activates as soon as the payment succeeds.</p>
+    <h2>Simple pricing, in rupees</h2>
+    <p class="muted">Start free, upgrade when you need unlimited sessions. Pay securely online — UPI, cards, net-banking. Your plan activates as soon as the payment succeeds.</p>
     <p class="small" id="currentPlanLine"></p>
     <div class="grid" id="plansGrid"><p class="muted">Loading plans…</p></div>
     <p class="small muted" id="payResult"></p>
@@ -350,7 +403,7 @@
 <!-- Upgrade modal -->
 <div id="upgradeModal" class="modal hidden">
   <div class="modal-card glass">
-    <h3>⭐ Upgrade to keep going</h3>
+    <h3>Upgrade to keep going</h3>
     <p class="muted" id="upgradeText">Your free plan limit is reached.</p>
     <div class="row">
       <button class="btn" id="upgradeGoBtn">See Plans</button>
@@ -368,7 +421,29 @@
   <div id="floatBody" class="small">Suggested answer will appear here.</div>
 </div>
 
-<footer>Interview Assistant — subscription service inspired by Parakeet AI. Not affiliated with Parakeet AI. Use live help only where permitted.</footer>
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span> Interv<span>IQ</span></div>
+      <p class="muted small">Real-time AI interview help — live answers, mock practice and AI notes, grounded in your own resume.</p>
+    </div>
+    <div>
+      <b>Product</b>
+      <button data-nav="create">Live sessions</button>
+      <button data-nav="mock">Mock interview</button>
+      <button data-nav="bank">Question bank</button>
+      <button data-nav="pricing">Pricing</button>
+    </div>
+    <div>
+      <b>Resources</b>
+      <button data-nav="home">How it works</button>
+      <button id="footerDownload">Download the desktop app</button>
+      <button data-nav="settings">Settings</button>
+      <button data-nav="auth">Log in / Sign up</button>
+    </div>
+  </div>
+  <p class="foot-base">© 2026 IntervIQ · Use live assistance only where it is permitted.</p>
+</footer>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>
