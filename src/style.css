@@ -1,4 +1,4 @@
-/* Interview Assistant — premium dashboard redesign (SaaS storefront)
+/* IntervIQ — premium dashboard redesign (SaaS storefront)
    Dark, glassy, refined: deep navy, indigo → violet → cyan gradient,
    hairline borders with a soft top highlight, generous spacing. */
 :root{
@@ -59,6 +59,9 @@ header{position:sticky;top:0;z-index:20;background:rgba(5,8,26,.75);backdrop-fil
 .logo.big{font-size:25px;justify-content:center;margin:0 0 4px}
 .logo.big .logo-mark{width:46px;height:46px;border-radius:14px;font-size:23px}
 .nav button,.nav a{color:var(--muted);background:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:14px;text-decoration:none;padding:8px 11px;border-radius:10px;transition:color .15s,background .15s}
+.nav button svg{width:17px;height:17px;flex:none;vertical-align:-3px}
+.logo-mark svg{width:18px;height:18px}
+.logo.big .logo-mark svg{width:24px;height:24px}
 .nav button:hover,.nav a:hover{color:var(--text);background:rgba(255,255,255,.07)}
 .nav button.active{color:#fff;background:var(--grad-soft);box-shadow:inset 0 0 0 1px rgba(139,92,246,.35)}
 .nav .cta{background:var(--grad);color:#fff;font-weight:700;box-shadow:0 6px 20px rgba(124,108,255,.45)}
@@ -88,6 +91,12 @@ section.active{display:block;animation:fadeUp .3s ease}
 
 /* feature cards */
 .icon-tile{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:13px;background:var(--grad-soft);border:1px solid rgba(139,92,246,.3);font-size:21px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.icon-tile svg{width:22px;height:22px}
+.section-head{margin:36px 0 2px}
+.section-head h2{margin:2px 0 4px}
+.dl-card{border:1px solid var(--line);border-radius:var(--radius-sm);padding:20px;background:rgba(7,11,29,.45)}
+.dl-card h3{margin:10px 0 4px}
+.dl-card .btn{margin-top:12px}
 .grid .card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
 .grid .card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.45);box-shadow:0 24px 55px rgba(2,6,23,.55),inset 0 1px 0 rgba(255,255,255,.09)}
 
@@ -154,6 +163,7 @@ select.chip,button.chip{font:inherit}
 .stat-card{display:flex;gap:14px;align-items:flex-start;background:var(--glass);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.07);transition:transform .16s ease,border-color .16s ease}
 .stat-card:hover{transform:translateY(-2px);border-color:rgba(139,92,246,.4)}
 .stat-icon{flex:none;width:42px;height:42px;border-radius:12px;background:var(--grad-soft);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:19px}
+.stat-icon svg{width:20px;height:20px}
 .stat-num{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat-label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-top:2px}
 .stat-sub{display:block;font-size:12px;color:var(--muted);margin-top:6px}
@@ -198,12 +208,17 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
 #floatPanel.hidden{display:none}
 #floatPanel.discreet{opacity:.92}
 
-footer{color:var(--muted2);text-align:center;padding:30px 16px;font-size:13px}
+footer{color:var(--muted2);padding:44px 16px 30px;font-size:13px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px;max-width:1180px;margin:0 auto;text-align:left}
+.foot-grid b{display:block;color:var(--text);margin-bottom:10px;font-size:13px}
+.foot-grid button{display:block;background:none;border:0;color:var(--muted);font:inherit;font-size:13px;padding:4px 0;cursor:pointer;text-align:left}
+.foot-grid button:hover{color:var(--text)}
+.foot-base{max-width:1180px;margin:28px auto 0;padding-top:18px;border-top:1px solid var(--line-soft);text-align:center}
 @media(max-width:1024px){.stat-grid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){
   .hero h1{font-size:34px}.nav{gap:4px;padding:10px 12px}.hero{padding:40px 10px 24px}
   main{padding:16px 12px 70px}.stat-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}
-  .card{padding:18px}.auth-card{padding:26px 20px}.hero-stats{gap:18px}
+  .card{padding:18px}.auth-card{padding:26px 20px}.hero-stats{gap:18px}.foot-grid{grid-template-columns:1fr;gap:18px}
 }
 
 /* ---------- top utility bar (logged-in app shell) ----------

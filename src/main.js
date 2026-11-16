@@ -57,6 +57,7 @@ function show(sectionId) {
   if (sectionId === 'live') refreshAiStatusLine()
 }
 document.querySelectorAll('[data-nav]').forEach((b) => b.addEventListener('click', () => show(b.dataset.nav)))
+$('footerDownload').addEventListener('click', () => { show('home'); setTimeout(() => document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' }), 60) })
 
 function setBodyAuth() {
   document.body.classList.toggle('logged-in', isLoggedIn())
@@ -203,7 +204,7 @@ function loadCashfreeScript(mode) {
       ? 'https://sdk.cashfree.com/js/ui/2.0.0/cashfree.prod.js'
       : 'https://sdk.cashfree.com/js/ui/2.0.0/cashfree.sandbox.js'
     s.onload = () => resolve()
-    s.onerror = () => reject(new Error('Could not load the Cashfree checkout. Check your connection and try again.'))
+    s.onerror = () => reject(new Error('Could not load the secure checkout. Check your connection and try again.'))
     document.head.appendChild(s)
   })
 }
@@ -259,9 +260,9 @@ function refreshAiStatusLine() {
   const setLine = $('aiStatusSettings')
   const text = aiStatus
     ? aiStatus.configured
-      ? `🤖 AI ready — ${esc(aiStatus.provider)} (${esc(aiStatus.chat_model || '')})`
+      ? `AI ready — ${esc(aiStatus.provider)} (${esc(aiStatus.chat_model || '')})`
       : '⚠️ AI is not configured yet — the service owner needs to add a provider key in the Admin panel.'
-    : '🤖 AI status unknown — the service may be starting up.'
+    : 'AI status unknown — the service may be starting up.'
   if (line) line.innerHTML = text
   if (setLine) setLine.innerHTML = text
 }
@@ -664,7 +665,7 @@ function stopMic() {
   recognition = null
   stopRecorder(micRecorder); micRecorder = null
   micStream?.getTracks().forEach((t) => t.stop()); micStream = null
-  $('micBtn').textContent = '🎤 Start Mic'
+  $('micBtn').textContent = 'Start Mic'
   audioStatus('Mic stopped.')
 }
 
@@ -684,7 +685,7 @@ function startMicSR(SR) {
     }
     // Interim text lives in the status line only — the transcript only
     // gets final sentences, so it no longer floods with "…" lines.
-    audioStatus('🎙️ Mic hearing… ' + (finalText + interim).trim().slice(-80))
+    audioStatus('Mic hearing… ' + (finalText + interim).trim().slice(-80))
     const text = finalText.trim()
     if (text && isQuestion(text) && $('autoAnswer').checked) {
       addTranscript('You: ' + text)
@@ -714,7 +715,7 @@ function startMicSR(SR) {
     micOn = true
     $('micBtn').textContent = '⏹ Stop Mic'
     addTranscript('[Mic listening (speech recognition)… speak the question, or capture the Meet/Zoom tab for the interviewer.]')
-    audioStatus('🎙️ Mic on — listening…')
+    audioStatus('Mic on — listening…')
   } catch (err) {
     addTranscript('[Mic could not start: ' + err.message + ' — trying service transcription instead.]')
     startMicWhisper()
@@ -729,7 +730,7 @@ async function startMicWhisper() {
     micOn = true
     $('micBtn').textContent = '⏹ Stop Mic'
     addTranscript('[Mic listening (service transcription)… speak and the transcript will appear in ~5 second chunks.]')
-    audioStatus('🎙️ Mic on (service) — listening…')
+    audioStatus('Mic on (service) — listening…')
   } catch (err) {
     alert('Microphone was blocked or is unavailable. Allow microphone access and retry. (' + err.message + ')')
   }
@@ -775,7 +776,7 @@ function stopTabAudio() {
   stopRecorder(tabRecorder); tabRecorder = null
   tabStream?.getTracks().forEach((t) => t.stop()); tabStream = null
   tabCtx?.close().catch(() => {}); tabCtx = null
-  $('tabAudioBtn').textContent = '🗂️ Capture Meet/Zoom Tab Audio'
+  $('tabAudioBtn').textContent = 'Capture Meet/Zoom Tab Audio'
   audioStatus('Tab audio stopped.')
 }
 
@@ -794,7 +795,7 @@ async function serviceVision(image) {
 $('shotBtn').addEventListener('click', async () => {
   let stream = null
   try {
-    $('shotBox').innerHTML = '<p class="small muted">📸 Pick the screen or window with the question…</p>'
+    $('shotBox').innerHTML = '<p class="small muted">Pick the screen or window with the question…</p>'
     stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
     const track = stream.getVideoTracks()[0]
     const video = document.createElement('video')
@@ -807,7 +808,7 @@ $('shotBtn').addEventListener('click', async () => {
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
     stream.getTracks().forEach((t) => t.stop())
     stream = null
-    $('shotBox').innerHTML = `<img src="${dataUrl}" style="max-width:100%;border-radius:8px" /><p class="small muted">📸 Reading the screenshot…</p>`
+    $('shotBox').innerHTML = `<img src="${dataUrl}" style="max-width:100%;border-radius:8px" /><p class="small muted">Reading the screenshot…</p>`
     const r = await serviceVision(dataUrl)
     if (r.error === '402') { showUpgrade(r.message); $('shotBox').innerHTML += '<p class="small muted">Plan limit reached — upgrade to continue.</p>'; return }
     if (r.error) {
@@ -1035,7 +1036,7 @@ async function loadAdminOverview() {
       <div class="card glass stat"><div class="stat-num">$${Number(o.revenue_total || 0).toFixed(2)}</div><div class="muted small">Revenue (successful payments)</div></div>
       <div class="card glass stat"><div class="stat-num">${o.ai_calls_today ?? 0}</div><div class="muted small">AI calls today</div></div>
     </div>
-    <p class="muted small">Tip: set your provider keys under AI Providers, and your prices under Plans. Users pay with Cashfree; subscriptions activate automatically.</p>`
+    <p class="muted small">Tip: set your provider keys under AI Providers, and your prices under Plans. Users pay through the secure payment gateway; subscriptions activate automatically.</p>`
   } catch (e) { adminErr(el, e) }
 }
 
