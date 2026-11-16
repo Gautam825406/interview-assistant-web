@@ -230,6 +230,7 @@ let whisperBusy = false
 let whisperQueue = []
 let lastWhisperText = ''
 let noKeyWarned = false
+let whisperErrorShown = false
 
 function audioStatus(text) { const el = $('audioStatus'); if (el) el.textContent = text }
 function langCode() { return LANG_CODE[currentSession?.language || getSettings().lang] || 'en' }
@@ -247,16 +248,33 @@ async function whisperTranscribe(blob) {
     return ''
   }
   try {
+    // The filename extension must match the audio container, or Whisper
+    // rejects the file outright.
+    const ext = (blob.type || '').includes('mp4') ? 'mp4' : 'webm'
     const form = new FormData()
-    form.append('file', blob, 'chunk.webm')
+    form.append('file', blob, 'chunk.' + ext)
     form.append('model', 'whisper-large-v3-turbo')
     form.append('language', langCode())
     form.append('response_format', 'json')
     const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + settings.groqKey }, body: form })
-    if (!res.ok) { const d = await res.json().catch(() => ({})); addTranscript('[Whisper error: ' + (d?.error?.message || 'HTTP ' + res.status) + ' — check the Groq key in Settings.]'); return '' }
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      const msg = d?.error?.message || ('HTTP ' + res.status)
+      // Don't flood the transcript with the same error every 5 seconds.
+      if (!whisperErrorShown) {
+        whisperErrorShown = true
+        addTranscript(res.status === 401 ? '[Whisper: Groq rejected the key (401) — check the key in Settings.]' : '[Whisper error: ' + msg + ']')
+      } else {
+        audioStatus('⚠️ Whisper error: ' + msg)
+      }
+      return ''
+    }
     const data = await res.json()
     return (data.text || '').trim()
-  } catch (err) { addTranscript('[Whisper failed: ' + err.message + ']'); return '' }
+  } catch (err) {
+    if (!whisperErrorShown) { whisperErrorShown = true; addTranscript('[Whisper failed: ' + err.message + ']') }
+    return ''
+  }
 }
 
 // Transcribe chunks one at a time so answers stay in order.
@@ -276,18 +294,38 @@ async function pumpWhisperQueue() {
   whisperBusy = false
 }
 
+// Record in ~5 second cycles: stop the recorder, send that complete file,
+// then start a fresh recorder. Using start(5000) timeslices instead gives
+// chunks WITHOUT the file header after the first one, and Whisper rejects
+// every one of them as "not a valid media file".
 function startWhisperRecorder(stream, label) {
   const audioOnly = new MediaStream(stream.getAudioTracks())
   if (!audioOnly.getAudioTracks().length) return null
   const mime = pickMimeType()
-  let rec
-  try { rec = new MediaRecorder(audioOnly, mime ? { mimeType: mime } : undefined) } catch { return null }
-  rec.ondataavailable = (e) => { if (e.data && e.data.size > 1000) { whisperQueue.push({ blob: e.data, label }); pumpWhisperQueue() } }
-  rec.onerror = () => { audioStatus('⚠️ ' + label + ' recorder error — restart capture.') }
-  try { rec.start(5000) } catch { return null } // 5-second chunks
-  return rec
+  whisperErrorShown = false
+  const ctrl = {
+    _stopped: false, _rec: null, _timer: null,
+    stop() {
+      this._stopped = true
+      clearTimeout(this._timer)
+      try { if (this._rec && this._rec.state !== 'inactive') this._rec.stop() } catch {}
+    },
+  }
+  const startOne = () => {
+    if (ctrl._stopped) return
+    let rec
+    try { rec = new MediaRecorder(audioOnly, mime ? { mimeType: mime } : undefined) } catch { return }
+    ctrl._rec = rec
+    rec.ondataavailable = (e) => { if (e.data && e.data.size > 1000) { whisperQueue.push({ blob: e.data, label }); pumpWhisperQueue() } }
+    rec.onerror = () => { audioStatus('⚠️ ' + label + ' recorder error — restart capture.') }
+    rec.onstop = () => { if (!ctrl._stopped) startOne() }
+    try { rec.start() } catch { return }
+    ctrl._timer = setTimeout(() => { try { if (rec.state === 'recording') rec.stop() } catch {} }, 5000)
+  }
+  startOne()
+  return ctrl._rec ? ctrl : null
 }
-function stopRecorder(rec) { try { if (rec && rec.state !== 'inactive') rec.stop() } catch {} }
+function stopRecorder(rec) { try { if (rec && typeof rec.stop === 'function') rec.stop() } catch {} }
 
 // ---------- mic (SpeechRecognition in Chrome, Whisper fallback) ----------
 $('micBtn').addEventListener('click', async () => {
