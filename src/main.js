@@ -49,6 +49,7 @@ function show(sectionId) {
   window.scrollTo({ top: 0 })
   if (sectionId === 'overview') renderOverview()
   if (sectionId === 'sessions') renderSessions()
+  if (sectionId === 'create') renderCreateDocs()
   if (sectionId === 'bank') renderBank()
   if (sectionId === 'settings') renderSettings()
   if (sectionId === 'pricing') renderPlans()
@@ -336,37 +337,105 @@ function openSession(id) {
     <p><b>Key points:</b></p><ul>${(s.notes?.keyPoints || []).map((k) => `<li>${esc(k)}</li>`).join('') || '<li>—</li>'}</ul>
     <p><b>Action items:</b></p><ul>${(s.notes?.actionItems || []).map((k) => `<li>${esc(k)}</li>`).join('') || '<li>—</li>'}</ul>
     <p><b>Score:</b> ${s.score ?? '—'} / 100</p>
+    ${(s.extraDocs?.length ? `<h3>Extra documents</h3><ul>${s.extraDocs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>` : '')}
     <h3>Transcript &amp; answers</h3>
     ${(s.turns || []).map((t) => `<p><b>Q:</b> ${esc(t.q)}</p><p><b>A:</b> ${esc(t.a)}</p><hr/>`).join('') || '<p class="muted">No turns recorded.</p>'}
     </div>`
+}
+
+// ---------- file text extraction (.txt / .pdf, in the browser) ----------
+async function extractFileText(file) {
+  if (file.name.endsWith('.txt')) return { text: await file.text(), pages: 1 }
+  if (file.name.endsWith('.pdf')) {
+    const pdfjs = await import('pdfjs-dist')
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+    const buf = await file.arrayBuffer()
+    const pdf = await pdfjs.getDocument({ data: buf }).promise
+    let text = ''
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const content = await page.getTextContent()
+      text += content.items.map((it) => it.str).join(' ') + '\n'
+    }
+    return { text, pages: pdf.numPages }
+  }
+  throw new Error('Only .txt and .pdf files are supported.')
 }
 
 // ---------- resume file ----------
 $('fResumeFile').addEventListener('change', async (e) => {
   const file = e.target.files[0]
   if (!file) return
-  if (file.name.endsWith('.txt')) {
-    $('fResume').value = await file.text()
-    return
+  try {
+    const { text, pages } = await extractFileText(file)
+    $('fResume').value = text
+    $('resumeFileNote').textContent = file.name.endsWith('.pdf')
+      ? `PDF extracted: ${pages} page(s). Check the text above.`
+      : 'Text file loaded — check the text above.'
+  } catch (err) {
+    $('resumeFileNote').textContent = 'Could not read this file — please paste the text above instead. (' + err.message + ')'
   }
-  if (file.name.endsWith('.pdf')) {
+})
+
+// ---------- extra documents (attached to a session, sent to the AI) ----------
+const MAX_EXTRA_DOCS = 5
+const MAX_DOC_CHARS = 6000
+let pendingExtraDocs = []   // {name, text} picked in the Create form
+function renderPendingExtraDocs() {
+  $('extraDocsList').innerHTML = pendingExtraDocs.length
+    ? pendingExtraDocs.map((d, i) => `<p>📄 ${esc(d.name)} <span class="muted">(${d.text.length} chars)</span> <button class="btn ghost small" data-extra-del="${i}">Remove</button></p>`).join('')
+    : '<p class="muted">No extra documents attached yet.</p>'
+  document.querySelectorAll('[data-extra-del]').forEach((b) => b.addEventListener('click', () => { pendingExtraDocs.splice(+b.dataset.extraDel, 1); renderPendingExtraDocs() }))
+}
+function renderCreateDocs() {
+  renderPendingExtraDocs()
+  const docs = store.get(DOCS_KEY(), [])
+  $('savedDocsPicker').innerHTML = docs.length
+    ? '<label>Or attach a saved document</label>' + docs.map((d, i) => `<label class="small" style="display:block;font-weight:400"><input type="checkbox" class="saved-doc-check" value="${i}" style="width:auto" /> ${esc(d.title)}</label>`).join('')
+    : '<p class="small muted">No saved documents yet — add some in Settings, or upload files above.</p>'
+}
+$('fExtraFiles').addEventListener('change', async (e) => {
+  for (const file of [...e.target.files]) {
+    if (pendingExtraDocs.length >= MAX_EXTRA_DOCS) { alert('Up to ' + MAX_EXTRA_DOCS + ' extra documents per session.'); break }
     try {
-      const pdfjs = await import('pdfjs-dist')
-      pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
-      const buf = await file.arrayBuffer()
-      const pdf = await pdfjs.getDocument({ data: buf }).promise
-      let text = ''
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const content = await page.getTextContent()
-        text += content.items.map((it) => it.str).join(' ') + '\n'
-      }
-      $('fResume').value = text
-      $('resumeFileNote').textContent = `PDF extracted: ${pdf.numPages} page(s). Check the text above.`
+      const { text } = await extractFileText(file)
+      pendingExtraDocs.push({ name: file.name, text: text.slice(0, MAX_DOC_CHARS) })
     } catch (err) {
-      $('resumeFileNote').textContent = 'PDF extraction failed in this browser — please paste your resume text above instead. (' + err.message + ')'
+      alert('Could not read ' + file.name + ': ' + err.message)
     }
   }
+  e.target.value = ''
+  renderPendingExtraDocs()
+})
+function collectExtraDocs() {
+  const docs = [...pendingExtraDocs]
+  document.querySelectorAll('.saved-doc-check:checked').forEach((c) => {
+    const d = store.get(DOCS_KEY(), [])[+c.value]
+    if (d && docs.length < MAX_EXTRA_DOCS) docs.push({ name: d.title, text: String(d.text || '').slice(0, MAX_DOC_CHARS) })
+  })
+  return docs
+}
+function clearExtraDocsForm() {
+  pendingExtraDocs = []
+  $('fExtraFiles').value = ''
+  renderPendingExtraDocs()
+  document.querySelectorAll('.saved-doc-check').forEach((c) => { c.checked = false })
+}
+// Attach a document in the middle of a live session — the next answer uses it.
+$('liveDocFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0]
+  if (!file || !currentSession) { e.target.value = ''; return }
+  try {
+    const { text } = await extractFileText(file)
+    currentSession.extraDocs = currentSession.extraDocs || []
+    if (currentSession.extraDocs.length >= MAX_EXTRA_DOCS) { $('liveDocNote').textContent = 'Already ' + MAX_EXTRA_DOCS + ' extra documents attached to this session.'; e.target.value = ''; return }
+    currentSession.extraDocs.push({ name: file.name, text: text.slice(0, MAX_DOC_CHARS) })
+    saveSessions(getSessions().map((s) => (s.id === currentSession.id ? currentSession : s)))
+    $('liveDocNote').textContent = 'Attached: ' + file.name + ' — the AI will use it for the next answer.'
+  } catch (err) {
+    $('liveDocNote').textContent = 'Could not read ' + file.name + ': ' + err.message
+  }
+  e.target.value = ''
 })
 
 function readCreateForm() {
@@ -377,6 +446,7 @@ function readCreateForm() {
     language: $('fLang').value,
     resume: $('fResume').value.trim(),
     jd: $('fJD').value.trim(),
+    extraDocs: collectExtraDocs(),
   }
 }
 
@@ -405,15 +475,17 @@ async function beginLiveSession(session) {
 $('startLiveBtn').addEventListener('click', async () => {
   const f = readCreateForm()
   if (f.resume) store.set(RESUME_KEY(), f.resume)
-  const session = { id: 's' + Date.now(), mode: f.mode, company: f.company, role: f.role, language: f.language, resume: f.resume, jd: f.jd, createdAt: Date.now(), turns: [], notes: null, score: null }
+  const session = { id: 's' + Date.now(), mode: f.mode, company: f.company, role: f.role, language: f.language, resume: f.resume, jd: f.jd, extraDocs: f.extraDocs, createdAt: Date.now(), turns: [], notes: null, score: null }
+  clearExtraDocsForm()
   await beginLiveSession(session)
 })
 $('saveSessionBtn').addEventListener('click', () => {
   const f = readCreateForm()
   if (f.resume) store.set(RESUME_KEY(), f.resume)
   const list = getSessions()
-  list.unshift({ id: 's' + Date.now(), mode: f.mode, company: f.company, role: f.role, language: f.language, resume: f.resume, jd: f.jd, createdAt: Date.now(), turns: [], notes: null, score: null })
+  list.unshift({ id: 's' + Date.now(), mode: f.mode, company: f.company, role: f.role, language: f.language, resume: f.resume, jd: f.jd, extraDocs: f.extraDocs, createdAt: Date.now(), turns: [], notes: null, score: null })
   saveSessions(list)
+  clearExtraDocsForm()
   alert('Draft session saved. Find it in Sessions.')
   show('sessions')
 })
@@ -430,7 +502,9 @@ setInterval(() => { if (currentSession && $('live').classList.contains('active')
 function systemPrompt() {
   const resume = currentSession?.resume || getResume()
   const jd = currentSession?.jd || ''
-  return 'You are a real-time interview assistant. Give a short speakable answer (2-3 sentences), then 3 bullets, then a longer version. Ground every claim in the resume below. Never invent experience, projects, skills or dates not in the resume. If the resume does not support a claim, say so. Resume:\n' + (resume || '(none)') + '\nJob description:\n' + (jd || '(none)')
+  const docs = currentSession?.extraDocs || []
+  const docsText = docs.length ? docs.map((d) => `- ${d.name}:\n${d.text}`).join('\n\n') : '(none)'
+  return 'You are a real-time interview assistant. Give a short speakable answer (2-3 sentences), then 3 bullets, then a longer version. Ground every claim in the resume below. Never invent experience, projects, skills or dates not in the resume. If the resume does not support a claim, say so. Resume:\n' + (resume || '(none)') + '\nJob description:\n' + (jd || '(none)') + '\nExtra documents:\n' + docsText
 }
 
 async function answerQuestion(question) {
