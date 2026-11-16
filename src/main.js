@@ -198,13 +198,15 @@ function renderPlans() {
   grid.querySelectorAll('[data-sub]').forEach((b) => b.addEventListener('click', () => subscribe(b.dataset.sub)))
 }
 
-function loadCashfreeScript(mode) {
+function loadCashfreeScript() {
   return new Promise((resolve, reject) => {
     if (window.Cashfree) return resolve()
     const s = document.createElement('script')
-    s.src = mode === 'PROD'
-      ? 'https://sdk.cashfree.com/js/ui/2.0.0/cashfree.prod.js'
-      : 'https://sdk.cashfree.com/js/ui/2.0.0/cashfree.sandbox.js'
+    // Cashfree Checkout JS v3 — one bundle for both modes; the mode is
+    // chosen when Cashfree({mode}) is called. The old js/ui/2.0.0 bundle's
+    // Cashfree is a class, so calling it as Cashfree({mode}) failed with
+    // "Cannot call a class as a function".
+    s.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
     s.onload = () => resolve()
     s.onerror = () => reject(new Error('Could not load the secure checkout. Check your connection and try again.'))
     document.head.appendChild(s)
@@ -216,7 +218,7 @@ async function subscribe(planSlug) {
   out.textContent = 'Creating your secure checkout…'
   try {
     const order = await api.checkout(planSlug)
-    await loadCashfreeScript(order.mode || 'SANDBOX')
+    await loadCashfreeScript()
     const cashfree = window.Cashfree({ mode: (order.mode || 'SANDBOX') === 'PROD' ? 'production' : 'sandbox' })
     await cashfree.checkout({ paymentSessionId: order.payment_session_id, redirectTarget: '_modal' })
     out.textContent = 'Verifying your payment…'
