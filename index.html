@@ -347,6 +347,12 @@
     <div class="card glass">
       <h3>Your account</h3>
       <div id="accountInfo"><p class="muted">Loading…</p></div>
+      <label class="small">Mobile number <span class="muted">(needed for payments — the payment provider requires it for the order)</span></label>
+      <div class="row">
+        <input id="setPhone" type="tel" inputmode="tel" placeholder="10-digit mobile number" style="max-width:220px" />
+        <button class="btn ghost small" id="savePhoneBtn">Save number</button>
+      </div>
+      <p class="small muted" id="phoneMsg"></p>
       <div class="row">
         <button class="btn ghost small" id="cancelSubBtn" style="display:none">Cancel subscription</button>
         <button class="btn ghost small" id="logoutBtn2">Log out</button>
