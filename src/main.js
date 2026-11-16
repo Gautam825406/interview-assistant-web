@@ -99,16 +99,18 @@ $('authSubmitBtn').addEventListener('click', async () => {
   const email = $('authEmail').value.trim()
   const password = $('authPassword').value
   const name = $('authName').value.trim()
+  const phone = $('authPhone').value.trim()
   const err = $('authError')
   const fail = (m) => { err.textContent = m; err.style.display = '' }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail('Enter a valid email address.')
   if (password.length < 6) return fail('Password must be at least 6 characters.')
   if (authMode === 'signup' && !name) return fail('Enter your name.')
+  if (authMode === 'signup' && !phone) return fail('Enter your mobile number — it is needed for payments.')
   $('authSubmitBtn').disabled = true
   $('authSubmitBtn').textContent = 'Please wait…'
   try {
     const res = authMode === 'signup'
-      ? await api.signup(name, email, password)
+      ? await api.signup(name, email, password, phone)
       : await api.login(email, password)
     saveAuth(res.token, res.user)
     meData = await api.me()

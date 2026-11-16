@@ -74,7 +74,7 @@ export const api = {
   plans: () => request('/api/plans', { auth: false }),
 
   // ---- auth ----
-  signup: (name, email, password) => request('/api/auth/signup', { method: 'POST', body: { name, email, password }, auth: false }),
+  signup: (name, email, password, phone) => request('/api/auth/signup', { method: 'POST', body: { name, email, password, phone }, auth: false }),
   login: (email, password) => request('/api/auth/login', { method: 'POST', body: { email, password }, auth: false }),
   me: () => request('/api/auth/me'),
   updateMe: (body) => request('/api/auth/me', { method: 'PATCH', body }),
