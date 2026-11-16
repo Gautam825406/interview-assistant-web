@@ -1034,7 +1034,7 @@ async function loadAdminPlans() {
         <div class="row">
           <div style="flex:1;min-width:140px"><label>Name</label><input data-p="${esc(p.slug)}" data-f="name" value="${esc(p.name || '')}" /></div>
           <div style="width:130px"><label>Price</label><input data-p="${esc(p.slug)}" data-f="price" type="number" step="0.01" min="0" value="${esc(p.price ?? '')}" /></div>
-          <div style="width:100px"><label>Currency</label><input data-p="${esc(p.slug)}" data-f="currency" value="${esc(p.currency || 'USD')}" /></div>
+          <div style="width:100px"><label>Currency</label><input data-p="${esc(p.slug)}" data-f="currency" value="${esc(p.currency || 'INR')}" /></div>
           <div style="width:130px"><label>Duration (days)</label><input data-p="${esc(p.slug)}" data-f="duration_days" type="number" min="0" value="${esc(p.duration_days ?? '')}" /></div>
         </div>
         <div class="row">
@@ -1076,7 +1076,7 @@ async function loadAdminPlans() {
       const price = Number($('newPlanPrice').value)
       const days = Number($('newPlanDays').value)
       if (!slug || !name || !Number.isFinite(price)) { alert('Slug, name and price are required.'); return }
-      try { await api.adminPlanCreate({ slug, name, price, currency: 'USD', duration_days: Number.isFinite(days) ? days : 30, sessions_limit: null, minutes_per_session: null, mock_limit: null, features: [], active: true }); alert('Plan created.'); loadAdminPlans(); loadPublicPlans() }
+      try { await api.adminPlanCreate({ slug, name, price, currency: 'INR', duration_days: Number.isFinite(days) ? days : 30, sessions_limit: null, minutes_per_session: null, mock_limit: null, features: [], active: true }); alert('Plan created.'); loadAdminPlans(); loadPublicPlans() }
       catch (e) { alert('Could not create plan: ' + e.message) }
     })
   } catch (e) { adminErr(el, e) }
