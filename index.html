@@ -25,16 +25,20 @@
       <button data-nav="settings">⚙️ Settings</button>
       <button data-nav="admin" id="adminNavBtn" class="admin-only">🛡️ Admin</button>
     </span>
-    <span style="flex:1"></span>
-    <span class="nav-label">Account</span>
-    <span class="nav-main" id="userChip"></span>
-    <button class="btn ghost small nav-main" id="logoutBtn">Log out</button>
-    <button class="btn ghost small nav-main" data-nav="home">🌐 Visit website</button>
     <button class="cta nav-guest" data-nav="auth">Log in / Sign up</button>
   </nav>
 </header>
 
 <main>
+  <!-- Top utility bar (signed-in users only): account + Visit website + Log out
+       live here, top-right of the content — not pinned to the bottom of the
+       left sidebar. -->
+  <div class="topbar" id="topbar">
+    <span style="flex:1"></span>
+    <span id="userChip"></span>
+    <button class="btn ghost small" data-nav="home">🌐 Visit website</button>
+    <button class="btn ghost small" id="logoutBtn">Log out</button>
+  </div>
   <!-- AUTH -->
   <section id="auth">
     <div class="auth-wrap">
@@ -196,6 +200,10 @@
       <p class="small muted" id="resumeFileNote">PDF text is extracted in your browser with pdf.js. If extraction fails, paste the text above.</p>
       <label>Job description / instructions (up to 20,000 chars)</label>
       <textarea id="fJD" maxlength="20000" placeholder="Paste the job description, or instructions for the assistant…"></textarea>
+      <label>Extra documents (optional) — sent to the AI along with your resume</label>
+      <input type="file" id="fExtraFiles" accept=".txt,.pdf" multiple />
+      <div id="extraDocsList" class="small muted"></div>
+      <div id="savedDocsPicker"></div>
       <div class="row">
         <button class="btn" id="startLiveBtn">Start Live Session →</button>
         <button class="btn ghost" id="saveSessionBtn">Save as Draft Session</button>
@@ -234,6 +242,11 @@
         <button class="btn ghost small" id="designHelpBtn">📐 System Design Help</button>
         <button class="btn ghost small" id="simulateBtn">▶ Simulate a question</button>
       </div>
+      <div class="row" style="margin-top:10px">
+        <label class="small" for="liveDocFile" style="margin:0">📎 Attach an extra document mid-session:</label>
+        <input type="file" id="liveDocFile" accept=".txt,.pdf" style="width:auto;flex:1" />
+      </div>
+      <p class="small muted" id="liveDocNote"></p>
       <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Screenshot: pick the screen with the question — the app reads it and answers. Transcription runs on the service; typed questions are the reliable fallback.</p>
     </div>
   </section>
