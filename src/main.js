@@ -38,13 +38,17 @@ function saveSessions(list) { store.set(SESSIONS_KEY(), list) }
 
 // ---------- navigation ----------
 function show(sectionId) {
-  if (!isLoggedIn() && sectionId !== 'auth') { showAuth(); return }
-  if (isLoggedIn() && sectionId === 'auth') { sectionId = 'home' }
-  if (sectionId === 'admin' && !isAdmin()) { sectionId = 'home' }
+  // Flow: landing page first (guests) → login/signup → user panel (overview).
+  // Guests may see the landing page and the auth page only; everything else
+  // sends them to login. Signed-in users land on the Overview panel.
+  if (!isLoggedIn() && sectionId !== 'auth' && sectionId !== 'home') { showAuth(); return }
+  if (isLoggedIn() && sectionId === 'auth') { sectionId = 'overview' }
+  if (sectionId === 'admin' && !isAdmin()) { sectionId = 'overview' }
   document.querySelectorAll('main section').forEach((s) => s.classList.toggle('active', s.id === sectionId))
   document.querySelectorAll('.nav [data-nav]').forEach((b) => b.classList.toggle('active', b.dataset.nav === sectionId))
   window.scrollTo({ top: 0 })
-  if (sectionId === 'dashboard') renderDashboard()
+  if (sectionId === 'overview') renderOverview()
+  if (sectionId === 'sessions') renderSessions()
   if (sectionId === 'bank') renderBank()
   if (sectionId === 'settings') renderSettings()
   if (sectionId === 'pricing') renderPlans()
@@ -109,7 +113,7 @@ $('authSubmitBtn').addEventListener('click', async () => {
     setBodyAuth()
     await refreshAiStatus()
     await loadPublicPlans()
-    show('home')
+    show('overview')
     if (pendingOrderId) { const oid = pendingOrderId; pendingOrderId = null; await handleVerify(oid) }
   } catch (e) {
     fail(e.message || 'Login failed. Try again.')
@@ -261,16 +265,29 @@ function refreshAiStatusLine() {
   if (setLine) setLine.innerHTML = text
 }
 
-// ---------- dashboard ----------
+// ---------- overview + sessions ----------
 const FILTERS = ['All', 'Interview', 'Regular', 'Mock']
-function renderDashboard() {
-  $('dashFilters').innerHTML = FILTERS.map((f) => `<button class="chip ${f === dashFilter ? 'active' : ''}" data-f="${f}">${f}</button>`).join('')
-  document.querySelectorAll('#dashFilters .chip').forEach((c) => c.addEventListener('click', () => { dashFilter = c.dataset.f; renderDashboard() }))
+function sessionCard(s) {
+  return `
+    <div class="session">
+      <div class="session-top"><b>${esc(s.company || 'Untitled')} — ${esc(s.role || s.mode)}</b><span class="chip">${esc(s.mode)}</span></div>
+      <span class="muted small">${esc(new Date(s.createdAt).toLocaleString())} · ${s.turns?.length || 0} Q&amp;A · score ${s.score ?? '—'}</span>
+      <p class="muted small">${esc((s.notes?.summary || '').slice(0, 160))}</p>
+      <div class="row"><button class="btn ghost small" data-open="${s.id}">Open</button><button class="btn ghost small" data-del="${s.id}">Delete</button></div>
+    </div>`
+}
+function bindSessionButtons(root) {
+  root.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openSession(b.dataset.open)))
+  root.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    saveSessions(getSessions().filter((s) => s.id !== b.dataset.del)); renderSessions(); renderOverview()
+  }))
+}
+function renderOverview() {
   const u = meData?.usage
   $('dashPlanLine').textContent = meData
     ? `Plan: ${meData.user.plan_slug || 'free'} · Sessions used: ${u?.sessions_used ?? '—'}${u?.sessions_limit ? ' / ' + u.sessions_limit : ''} · Mocks used: ${u?.mocks_used ?? '—'}${u?.mock_limit ? ' / ' + u.mock_limit : ''}`
     : 'Your saved sessions live only in this browser.'
-  // Premium stat cards (textContent — no HTML escaping needed here).
+  // Stat cards (textContent — no HTML escaping needed here).
   const firstName = (meData?.user?.name || '').split(' ')[0]
   $('dashName').textContent = firstName ? `, ${firstName}` : ''
   const sUsed = u?.sessions_used ?? 0, sLim = u?.sessions_limit
@@ -293,21 +310,19 @@ function renderDashboard() {
     $('statAi').textContent = '…'
     $('statAiSub').textContent = 'Checking…'
   }
+  const recent = getSessions().slice(0, 4)
+  $('recentList').innerHTML = recent.length ? recent.map(sessionCard).join('') : '<p class="muted">No sessions yet. Create your first session — it will show up here.</p>'
+  bindSessionButtons($('recentList'))
+}
+function renderSessions() {
+  $('dashFilters').innerHTML = FILTERS.map((f) => `<button class="chip ${f === dashFilter ? 'active' : ''}" data-f="${f}">${f}</button>`).join('')
+  document.querySelectorAll('#dashFilters .chip').forEach((c) => c.addEventListener('click', () => { dashFilter = c.dataset.f; renderSessions() }))
   const q = ($('dashSearch').value || '').toLowerCase()
   const list = getSessions().filter((s) => (dashFilter === 'All' || s.mode === dashFilter) && (!q || (s.company + ' ' + s.role + ' ' + s.mode).toLowerCase().includes(q)))
-  $('dashList').innerHTML = list.length ? list.map((s) => `
-    <div class="session">
-      <div class="session-top"><b>${esc(s.company || 'Untitled')} — ${esc(s.role || s.mode)}</b><span class="chip">${esc(s.mode)}</span></div>
-      <span class="muted small">${esc(new Date(s.createdAt).toLocaleString())} · ${s.turns?.length || 0} Q&amp;A · score ${s.score ?? '—'}</span>
-      <p class="muted small">${esc((s.notes?.summary || '').slice(0, 160))}</p>
-      <div class="row"><button class="btn ghost small" data-open="${s.id}">Open</button><button class="btn ghost small" data-del="${s.id}">Delete</button></div>
-    </div>`).join('') : '<p class="muted">No sessions yet. Create your first session — it will be saved here.</p>'
-  document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openSession(b.dataset.open)))
-  document.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
-    saveSessions(getSessions().filter((s) => s.id !== b.dataset.del)); renderDashboard()
-  }))
+  $('dashList').innerHTML = list.length ? list.map(sessionCard).join('') : '<p class="muted">No sessions yet. Create your first session — it will be saved here.</p>'
+  bindSessionButtons($('dashList'))
 }
-$('dashSearch').addEventListener('input', renderDashboard)
+$('dashSearch').addEventListener('input', renderSessions)
 
 function openSession(id) {
   const s = getSessions().find((x) => x.id === id)
@@ -399,8 +414,8 @@ $('saveSessionBtn').addEventListener('click', () => {
   const list = getSessions()
   list.unshift({ id: 's' + Date.now(), mode: f.mode, company: f.company, role: f.role, language: f.language, resume: f.resume, jd: f.jd, createdAt: Date.now(), turns: [], notes: null, score: null })
   saveSessions(list)
-  alert('Draft session saved to the Dashboard.')
-  show('dashboard')
+  alert('Draft session saved. Find it in Sessions.')
+  show('sessions')
 })
 
 // ---------- live timer ----------
@@ -757,7 +772,7 @@ function makeNotes(session) {
   }
 }
 $('endLiveBtn').addEventListener('click', () => {
-  if (!currentSession) { show('dashboard'); return }
+  if (!currentSession) { show('sessions'); return }
   stopMic()
   stopTabAudio()
   currentSession.notes = makeNotes(currentSession)
@@ -837,7 +852,7 @@ function finishMock() {
   const list = getSessions(); list.unshift(session); saveSessions(list)
   $('mockRun').style.display = 'none'
   $('mockResult').style.display = ''
-  $('mockResult').innerHTML = `<h3>Mock complete — ${avg !== null ? avg + '/100' : 'no score'}</h3><p>${esc(avg === null ? 'No scores were recorded (the AI feedback was unavailable).' : avg >= 75 ? 'Strong. Keep practising the weaker questions.' : avg >= 55 ? 'Good base. Work on concrete examples and structure.' : 'Keep practising — aim for a concrete example in every answer.')}</p><button class="btn" onclick="document.querySelector('[data-nav=dashboard]').click()">View in Dashboard</button>`
+  $('mockResult').innerHTML = `<h3>Mock complete — ${avg !== null ? avg + '/100' : 'no score'}</h3><p>${esc(avg === null ? 'No scores were recorded (the AI feedback was unavailable).' : avg >= 75 ? 'Strong. Keep practising the weaker questions.' : avg >= 55 ? 'Good base. Work on concrete examples and structure.' : 'Keep practising — aim for a concrete example in every answer.')}</p><button class="btn" onclick="document.querySelector('[data-nav=sessions]').click()">View in Sessions</button>`
   $('mockSetup').style.display = ''
   mockState = null
 }
@@ -901,7 +916,7 @@ $('cancelSubBtn').addEventListener('click', async () => {
 $('clearDataBtn').addEventListener('click', () => {
   if (!confirm('Clear all saved sessions, resume, documents and settings in this browser? (Your account and plan are kept on the service.)')) return
   ;[SESSIONS_KEY(), RESUME_KEY(), DOCS_KEY(), SETTINGS_KEY()].forEach((k) => localStorage.removeItem(k))
-  renderSettings(); renderDashboard()
+  renderSettings(); renderSessions(); renderOverview()
 })
 $('addDocBtn').addEventListener('click', () => {
   const title = $('docTitle').value.trim()
@@ -1131,14 +1146,17 @@ async function init() {
       meData = await api.me()
       setBodyAuth()
       await refreshAiStatus()
-      show('home')
+      show('overview')
       if (pendingOrderId) { const oid = pendingOrderId; pendingOrderId = null; await handleVerify(oid) }
     } catch (e) {
       showAuth(e.message || 'Could not reach the service. Try again.')
     }
   } else {
-    showAuth()
+    // Guests start on the landing page, not the login form.
+    setBodyAuth()
+    show('home')
     if (pendingOrderId) {
+      showAuth()
       $('authError').textContent = 'Log in to finish verifying your payment.'
       $('authError').style.display = ''
     }
