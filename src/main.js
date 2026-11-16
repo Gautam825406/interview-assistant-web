@@ -220,8 +220,35 @@ async function subscribe(planSlug) {
     out.textContent = 'Verifying your payment…'
     await handleVerify(order.order_id)
   } catch (e) {
+    if ((e.message || '').includes('PHONE_REQUIRED')) { askPhoneThenRetry(planSlug); return }
     out.textContent = 'Checkout failed: ' + (e.message || 'unknown error')
   }
+}
+
+// The payment provider rejects an order with no mobile number, so ask for
+// it right here, save it on the account, and retry the checkout once.
+function askPhoneThenRetry(planSlug) {
+  const out = $('payResult')
+  out.innerHTML = ''
+  const wrap = document.createElement('div')
+  wrap.innerHTML = `<p>The payment provider needs your mobile number for the order.</p>
+    <input id="payPhone" type="tel" inputmode="tel" placeholder="10-digit mobile number" style="max-width:220px" />
+    <button class="btn" id="payPhoneBtn">Save number &amp; continue</button>
+    <p class="small muted" id="payPhoneMsg"></p>`
+  out.appendChild(wrap)
+  $('payPhone').focus()
+  $('payPhoneBtn').addEventListener('click', async () => {
+    const phone = $('payPhone').value.trim()
+    if (!phone) { $('payPhoneMsg').textContent = 'Enter your mobile number.'; return }
+    $('payPhoneMsg').textContent = 'Saving…'
+    try {
+      await api.updateMe({ phone })
+      meData = await api.me()
+      await subscribe(planSlug)
+    } catch (e2) {
+      $('payPhoneMsg').textContent = e2.message || 'Could not save the number.'
+    }
+  })
 }
 
 async function handleVerify(orderId) {
@@ -965,6 +992,7 @@ async function renderSettings() {
       <p class="muted small">Plan: <b>${esc(u.plan_slug || 'free')}</b>${sub ? ` · ${esc(sub.status)}${sub.expires_at ? ' until ' + esc(new Date(sub.expires_at).toLocaleDateString()) : ''}` : ' · no active subscription'}</p>
       <p class="muted small">Usage: ${usg.sessions_used ?? '—'}${usg.sessions_limit ? ' / ' + usg.sessions_limit : ''} sessions · ${usg.mocks_used ?? '—'}${usg.mock_limit ? ' / ' + usg.mock_limit : ''} mocks</p>`
     $('cancelSubBtn').style.display = sub && sub.status === 'active' ? '' : 'none'
+    if (document.activeElement !== $('setPhone')) $('setPhone').value = u.phone || ''
   } catch (e) {
     $('accountInfo').innerHTML = '<p class="muted">Could not load account info: ' + esc(e.message) + '</p>'
   }
@@ -975,6 +1003,18 @@ async function renderSettings() {
     const d = store.get(DOCS_KEY(), []); d.splice(+b.dataset.docdel, 1); store.set(DOCS_KEY(), d); renderSettings()
   }))
 }
+$('savePhoneBtn').addEventListener('click', async () => {
+  const msg = $('phoneMsg')
+  const phone = $('setPhone').value.trim()
+  if (!phone) { msg.textContent = 'Enter your mobile number.'; return }
+  msg.textContent = 'Saving…'
+  try {
+    await api.updateMe({ phone })
+    meData = await api.me()
+    msg.textContent = 'Saved.'
+    renderSettings()
+  } catch (e) { msg.textContent = e.message || 'Could not save the number.' }
+})
 $('saveSettingsBtn').addEventListener('click', () => {
   store.set(SETTINGS_KEY(), { lang: $('setLang').value })
   alert('Settings saved in this browser only.')

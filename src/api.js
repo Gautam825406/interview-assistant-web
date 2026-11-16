@@ -1,4 +1,4 @@
-// Interview Assistant SaaS — API client.
+// IntervIQ SaaS — API client.
 // Talks only to the SaaS backend (see ../interview-assistant-saas/API_CONTRACT.md).
 // The backend holds all provider API keys; this client NEVER sees or sends one.
 // Base URL: VITE_API_URL at build time, fallback to the Render default.
@@ -77,6 +77,7 @@ export const api = {
   signup: (name, email, password) => request('/api/auth/signup', { method: 'POST', body: { name, email, password }, auth: false }),
   login: (email, password) => request('/api/auth/login', { method: 'POST', body: { email, password }, auth: false }),
   me: () => request('/api/auth/me'),
+  updateMe: (body) => request('/api/auth/me', { method: 'PATCH', body }),
 
   // ---- subscription / Cashfree ----
   checkout: (plan_slug) => request('/api/subscriptions/checkout', { method: 'POST', body: { plan_slug } }),
