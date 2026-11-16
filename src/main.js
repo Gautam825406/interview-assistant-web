@@ -42,6 +42,7 @@ function show(sectionId) {
   if (isLoggedIn() && sectionId === 'auth') { sectionId = 'home' }
   if (sectionId === 'admin' && !isAdmin()) { sectionId = 'home' }
   document.querySelectorAll('main section').forEach((s) => s.classList.toggle('active', s.id === sectionId))
+  document.querySelectorAll('.nav [data-nav]').forEach((b) => b.classList.toggle('active', b.dataset.nav === sectionId))
   window.scrollTo({ top: 0 })
   if (sectionId === 'dashboard') renderDashboard()
   if (sectionId === 'bank') renderBank()
@@ -269,16 +270,37 @@ function renderDashboard() {
   $('dashPlanLine').textContent = meData
     ? `Plan: ${meData.user.plan_slug || 'free'} · Sessions used: ${u?.sessions_used ?? '—'}${u?.sessions_limit ? ' / ' + u.sessions_limit : ''} · Mocks used: ${u?.mocks_used ?? '—'}${u?.mock_limit ? ' / ' + u.mock_limit : ''}`
     : 'Your saved sessions live only in this browser.'
+  // Premium stat cards (textContent — no HTML escaping needed here).
+  const firstName = (meData?.user?.name || '').split(' ')[0]
+  $('dashName').textContent = firstName ? `, ${firstName}` : ''
+  const sUsed = u?.sessions_used ?? 0, sLim = u?.sessions_limit
+  $('statSessions').textContent = sLim ? `${sUsed} / ${sLim}` : `${sUsed}`
+  $('statSessionsBar').style.width = sLim ? Math.min(100, (sUsed / sLim) * 100) + '%' : '0%'
+  $('statSessionsSub').textContent = sLim ? `${Math.max(0, sLim - sUsed)} session${sLim - sUsed === 1 ? '' : 's'} left` : 'Unlimited sessions'
+  const mUsed = u?.mocks_used ?? 0, mLim = u?.mock_limit
+  $('statMocks').textContent = mLim ? `${mUsed} / ${mLim}` : `${mUsed}`
+  $('statMocksBar').style.width = mLim ? Math.min(100, (mUsed / mLim) * 100) + '%' : '0%'
+  $('statMocksSub').textContent = mLim ? `${Math.max(0, mLim - mUsed)} mock${mLim - mUsed === 1 ? '' : 's'} left` : 'Unlimited mocks'
+  const planSlug = (meData?.user?.plan_slug || 'free')
+  $('statPlan').textContent = planSlug.toUpperCase()
+  $('statPlanSub').textContent = meData?.subscription?.expires_at
+    ? `Valid until ${new Date(meData.subscription.expires_at).toLocaleDateString()}`
+    : planSlug === 'free' ? 'Upgrade for unlimited' : 'Active subscription'
+  if (aiStatus) {
+    $('statAi').textContent = aiStatus.configured ? 'Ready' : 'Not set up'
+    $('statAiSub').textContent = aiStatus.configured ? `${aiStatus.provider}${aiStatus.chat_model ? ' · ' + aiStatus.chat_model : ''}` : 'Owner must add a key'
+  } else {
+    $('statAi').textContent = '…'
+    $('statAiSub').textContent = 'Checking…'
+  }
   const q = ($('dashSearch').value || '').toLowerCase()
   const list = getSessions().filter((s) => (dashFilter === 'All' || s.mode === dashFilter) && (!q || (s.company + ' ' + s.role + ' ' + s.mode).toLowerCase().includes(q)))
   $('dashList').innerHTML = list.length ? list.map((s) => `
     <div class="session">
-      <b>${esc(s.company || 'Untitled')} — ${esc(s.role || s.mode)}</b>
-      <span class="chip">${esc(s.mode)}</span>
+      <div class="session-top"><b>${esc(s.company || 'Untitled')} — ${esc(s.role || s.mode)}</b><span class="chip">${esc(s.mode)}</span></div>
       <span class="muted small">${esc(new Date(s.createdAt).toLocaleString())} · ${s.turns?.length || 0} Q&amp;A · score ${s.score ?? '—'}</span>
       <p class="muted small">${esc((s.notes?.summary || '').slice(0, 160))}</p>
-      <button class="btn ghost small" data-open="${s.id}">Open</button>
-      <button class="btn ghost small" data-del="${s.id}">Delete</button>
+      <div class="row"><button class="btn ghost small" data-open="${s.id}">Open</button><button class="btn ghost small" data-del="${s.id}">Delete</button></div>
     </div>`).join('') : '<p class="muted">No sessions yet. Create your first session — it will be saved here.</p>'
   document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openSession(b.dataset.open)))
   document.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
