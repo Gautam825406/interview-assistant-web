@@ -103,6 +103,7 @@
       <div class="timer" id="liveTimer">00:00</div>
       <button class="btn green" id="micBtn">🎤 Start Mic</button>
       <button class="btn ghost" id="tabAudioBtn">🗂️ Capture Meet/Zoom Tab Audio</button>
+      <button class="btn ghost" id="shotBtn">📸 Screenshot</button>
       <label class="small"><input type="checkbox" id="autoAnswer" checked style="width:auto" /> Auto Answer</label>
       <label class="small"><input type="checkbox" id="discreetToggle" style="width:auto" /> Discreet panel</label>
       <label class="small"><input type="checkbox" id="smallTextToggle" style="width:auto" /> Small text</label>
@@ -110,6 +111,7 @@
       <button class="btn danger" id="endLiveBtn">End &amp; Save Notes</button>
     </div>
     <p class="small muted" id="audioStatus">Audio: mic off · tab audio off. Tip — add a free Groq key in Settings to transcribe the interviewer's Meet/Zoom tab audio.</p>
+    <div id="shotBox"></div>
     <div class="grid" style="grid-template-columns:1fr 1fr">
       <div class="card"><h3>Live transcript</h3><div class="transcript" id="transcript">Transcript will appear here. Mic works in Chrome without a key; Meet/Zoom tab audio is transcribed with a free Groq key (Settings).</div></div>
       <div class="card"><h3>Suggested answer</h3><div id="answerBox"><p class="muted">Ask a question and the suggested answer will appear here.</p></div></div>
@@ -122,7 +124,7 @@
         <button class="btn ghost small" id="designHelpBtn">📐 System Design Help</button>
         <button class="btn ghost small" id="simulateBtn">▶ Simulate a question</button>
       </div>
-      <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Transcription is browser-based; typed questions are the reliable fallback.</p>
+      <p class="small muted">Mic: best in desktop Chrome. Tab audio: choose the Meet/Zoom tab and tick “Share audio”. Screenshot: pick the screen with the question — the app reads it and answers. Transcription is browser-based; typed questions are the reliable fallback.</p>
     </div>
   </section>
 
