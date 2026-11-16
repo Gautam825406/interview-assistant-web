@@ -5,12 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Interview Assistant — Real-Time AI Interview Helper</title>
 <meta name="description" content="Real-time AI interview assistant: listens to the interviewer, detects the question, and shows a suggested answer live. Mock interviews, resume grounding, saved sessions and AI notes." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
 <header>
   <nav class="nav">
-    <div class="logo">🎙️ Interview<span>Assistant</span></div>
+    <div class="logo"><span class="logo-mark">🎙️</span> Interview<span>Assistant</span></div>
     <span class="nav-main">
       <button data-nav="home">Home</button>
       <button data-nav="dashboard">Dashboard</button>
@@ -33,7 +36,7 @@
   <section id="auth">
     <div class="auth-wrap">
       <div class="auth-card glass">
-        <div class="logo big">🎙️ Interview<span>Assistant</span></div>
+        <div class="logo big"><span class="logo-mark">🎙️</span> Interview<span>Assistant</span></div>
         <p class="muted">Real-time AI answers while you're still talking. Sign up free — 10 live sessions and 1 mock interview included.</p>
         <div class="row auth-tabs">
           <button class="chip active" id="tabLogin">Log in</button>
@@ -65,41 +68,91 @@
         <button class="btn ghost" data-nav="mock">Practice a Mock Interview</button>
       </div>
       <p class="small muted">Free plan: 10 live sessions (10 min each) + 1 mock interview. Upgrade anytime — secure checkout by Cashfree.</p>
+      <div class="hero-stats">
+        <div><b>10</b><span>Free live sessions</span></div>
+        <div><b>1</b><span>Free mock interview</span></div>
+        <div><b>0</b><span>API keys needed</span></div>
+      </div>
       <div class="plan-strip" id="homePlanStrip"></div>
     </div>
     <div class="grid">
-      <div class="card glass"><h3>🎯 Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
-      <div class="card glass"><h3>📄 Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
-      <div class="card glass"><h3>💻 Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
-      <div class="card glass"><h3>🧠 Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
-      <div class="card glass"><h3>📝 AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
-      <div class="card glass"><h3>🌍 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">🎯</span> Auto Answer</h3><p class="muted">Detects questions live and suggests answers, so you're never caught blank.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">📄</span> Resume-grounded</h3><p class="muted">Upload or paste your resume + job description. Answers cite your real projects — never invented experience.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">💻</span> Code help</h3><p class="muted">Coding questions get a talk-through plus working code, with complexity and edge cases.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">🧠</span> Mock Interview</h3><p class="muted">Practice against an AI interviewer tailored to your role, with per-answer feedback and a score.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">📝</span> AI Notes</h3><p class="muted">Key points, action items and decisions, summarised after every call.</p></div>
+      <div class="card glass"><h3><span class="icon-tile">🌍</span> 50+ languages</h3><p class="muted">Pick your session language. Best with Chrome on desktop for live speech recognition.</p></div>
     </div>
     <div class="card glass">
+      <p class="eyebrow">How it works</p>
       <h2>Before, during, and after the call</h2>
-      <p class="muted"><b class="bright">01 Auto Answer</b> — live question detection &amp; suggested answers.<br/>
-      <b class="bright">02 Documents</b> — resume, job description and notes as live context.<br/>
-      <b class="bright">03 AI Notes</b> — summary, key points and action items after the call.<br/>
-      <b class="bright">04 Mock Interview</b> — practice first, so the real one feels familiar.</p>
+      <div class="steps">
+        <div class="step"><span class="step-num">1</span><b>Auto Answer</b><p class="muted">Live question detection &amp; suggested answers.</p></div>
+        <div class="step"><span class="step-num">2</span><b>Documents</b><p class="muted">Resume, job description and notes as live context.</p></div>
+        <div class="step"><span class="step-num">3</span><b>AI Notes</b><p class="muted">Summary, key points and action items after the call.</p></div>
+        <div class="step"><span class="step-num">4</span><b>Mock Interview</b><p class="muted">Practice first, so the real one feels familiar.</p></div>
+      </div>
     </div>
     <div class="card glass">
+      <p class="eyebrow">FAQ</p>
       <h2>Frequently asked questions</h2>
-      <p><b>Does it need an API key?</b><br/><span class="muted">No — the AI runs on our servers. You just sign up and use it; the service owner manages the AI providers.</span></p>
-      <p><b>How does live listening work?</b><br/><span class="muted">In Chrome, use your microphone (SpeechRecognition) or type the question. For Meet/Zoom in the browser, share the tab with audio. Typed questions always work as a fallback.</span></p>
-      <p><b>Is it invisible in screen-share?</b><br/><span class="muted">No — this web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only a native desktop app can hide from screen-share. Use live help only where it is permitted.</span></p>
-      <p><b>Where is my data?</b><br/><span class="muted">Your account, plan and usage live on the service. Your session notes and resume stay in your browser unless you save them in a session.</span></p>
-      <p><b>How do I pay?</b><br/><span class="muted">Pick a plan on the Pricing page and pay securely with Cashfree (UPI, cards, net-banking). Your plan activates as soon as the payment succeeds.</span></p>
+      <div class="faq-item"><b>Does it need an API key?</b><p class="muted">No — the AI runs on our servers. You just sign up and use it; the service owner manages the AI providers.</p></div>
+      <div class="faq-item"><b>How does live listening work?</b><p class="muted">In Chrome, use your microphone (SpeechRecognition) or type the question. For Meet/Zoom in the browser, share the tab with audio. Typed questions always work as a fallback.</p></div>
+      <div class="faq-item"><b>Is it invisible in screen-share?</b><p class="muted">No — this web version is NOT invisible. If you share the whole screen or this browser window, it will show. Only a native desktop app can hide from screen-share. Use live help only where it is permitted.</p></div>
+      <div class="faq-item"><b>Where is my data?</b><p class="muted">Your account, plan and usage live on the service. Your session notes and resume stay in your browser unless you save them in a session.</p></div>
+      <div class="faq-item"><b>How do I pay?</b><p class="muted">Pick a plan on the Pricing page and pay securely with Cashfree (UPI, cards, net-banking). Your plan activates as soon as the payment succeeds.</p></div>
     </div>
   </section>
 
   <!-- DASHBOARD -->
   <section id="dashboard">
-    <h2>Call Sessions</h2>
-    <p class="muted" id="dashPlanLine">Your saved sessions live only in this browser.</p>
+    <div class="dash-head">
+      <div>
+        <p class="eyebrow">Dashboard</p>
+        <h2>Welcome back<span id="dashName"></span></h2>
+        <p class="muted" id="dashPlanLine">Your saved sessions live only in this browser.</p>
+      </div>
+      <button class="btn" data-nav="create">+ New Session</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🎙️</div>
+        <div style="flex:1;min-width:0">
+          <span class="stat-num" id="statSessions">—</span>
+          <span class="stat-label">Live sessions</span>
+          <div class="progress"><div id="statSessionsBar" style="width:0%"></div></div>
+          <span class="stat-sub" id="statSessionsSub">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧠</div>
+        <div style="flex:1;min-width:0">
+          <span class="stat-num" id="statMocks">—</span>
+          <span class="stat-label">Mock interviews</span>
+          <div class="progress"><div id="statMocksBar" style="width:0%"></div></div>
+          <span class="stat-sub" id="statMocksSub">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div style="flex:1;min-width:0">
+          <span class="stat-num" id="statPlan">FREE</span>
+          <span class="stat-label">Current plan</span>
+          <span class="stat-sub" id="statPlanSub">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🤖</div>
+        <div style="flex:1;min-width:0">
+          <span class="stat-num" id="statAi">…</span>
+          <span class="stat-label">AI service</span>
+          <span class="stat-sub" id="statAiSub">Checking…</span>
+        </div>
+      </div>
+    </div>
     <input id="dashSearch" placeholder="Search sessions, company, role…" />
     <div id="dashFilters" class="row"></div>
     <div id="dashList"></div>
-    <button class="btn" data-nav="create">+ New Session</button>
   </section>
 
   <!-- CREATE -->
